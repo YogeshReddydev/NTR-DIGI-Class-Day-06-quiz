@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react';
-import { Award, Download, Printer, X, CheckCircle2, Shield, Sparkles } from 'lucide-react';
+import { Award, Download, Printer, X, FileText, Shield } from 'lucide-react';
 import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import { QuizAttempt } from '../types';
-import { INSTITUTE_NAME, QUIZ_DAY, QUIZ_TOPIC_ENGLISH, QUIZ_TOPIC_TELUGU, QUIZ_SUBTITLE, LEVEL_INFO } from '../data/quizData';
+import { INSTITUTE_NAME, QUIZ_DAY, QUIZ_TOPIC_ENGLISH, QUIZ_TOPIC_TELUGU, LEVEL_INFO } from '../data/quizData';
 import { Logo } from './Logo';
 
 interface CertificateModalProps {
@@ -12,18 +13,53 @@ interface CertificateModalProps {
 
 export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onClose }) => {
   const certificateRef = useRef<HTMLDivElement>(null);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloadingImage, setIsDownloadingImage] = useState(false);
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
 
   const levelInfo = LEVEL_INFO[attempt.level];
+
+  // Download certificate strictly as PDF document (no questions or extra UI)
+  const handleDownloadPDF = async () => {
+    if (!certificateRef.current) return;
+    setIsDownloadingPDF(true);
+
+    try {
+      const canvas = await html2canvas(certificateRef.current, {
+        scale: 3, // High DPI for crisp vector-like text
+        useCORS: true,
+        backgroundColor: '#0f172a',
+        logging: false
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+
+      // Create landscape PDF matching A4 standard dimensions
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`NTR_Digi_Class_Certificate_${attempt.fullName.replace(/\s+/g, '_')}_Level${attempt.level}.pdf`);
+    } catch (err) {
+      console.error('Certificate PDF export error:', err);
+    } finally {
+      setIsDownloadingPDF(false);
+    }
+  };
 
   // Download certificate as PNG image
   const handleDownloadImage = async () => {
     if (!certificateRef.current) return;
-    setIsDownloading(true);
+    setIsDownloadingImage(true);
 
     try {
       const canvas = await html2canvas(certificateRef.current, {
-        scale: 3, // High DPI
+        scale: 3,
         useCORS: true,
         backgroundColor: '#0f172a',
         logging: false
@@ -37,7 +73,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
     } catch (err) {
       console.error('Certificate canvas export error:', err);
     } finally {
-      setIsDownloading(false);
+      setIsDownloadingImage(false);
     }
   };
 
@@ -53,7 +89,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
       <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-4xl w-full shadow-2xl overflow-hidden my-auto relative print:border-none print:shadow-none print:rounded-none">
         
         {/* Top Control Bar (Hidden when printing) */}
-        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-800 bg-slate-950 print:hidden">
+        <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-5 border-b border-slate-800 bg-slate-950 gap-3 print:hidden">
           <div className="flex items-center gap-2">
             <Award className="w-5 h-5 text-amber-400" aria-hidden="true" />
             <h3 id="certificateTitle" className="text-base font-bold text-white">
@@ -61,30 +97,43 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
             </h3>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            {/* Primary PDF Download Button */}
             <button
-              onClick={handlePrint}
-              aria-label="Print certificate or save as PDF"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+              onClick={handleDownloadPDF}
+              disabled={isDownloadingPDF || isDownloadingImage}
+              aria-label="Download official certificate as PDF file"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 text-xs font-black shadow-lg transition-all cursor-pointer disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
             >
-              <Printer className="w-4 h-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Print / PDF</span>
+              <FileText className="w-4 h-4" aria-hidden="true" />
+              <span>{isDownloadingPDF ? 'Generating PDF...' : 'Download Certificate (PDF)'}</span>
             </button>
 
+            {/* PNG Image Download */}
             <button
               onClick={handleDownloadImage}
-              disabled={isDownloading}
+              disabled={isDownloadingPDF || isDownloadingImage}
               aria-label="Download certificate image as PNG"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-xs font-black shadow-lg transition-all cursor-pointer disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all cursor-pointer disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
             >
               <Download className="w-4 h-4" aria-hidden="true" />
-              <span>{isDownloading ? 'Generating Image...' : 'Download PNG'}</span>
+              <span>{isDownloadingImage ? 'Generating Image...' : 'PNG Image'}</span>
+            </button>
+
+            {/* Print button */}
+            <button
+              onClick={handlePrint}
+              aria-label="Print certificate or save via print dialog"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+            >
+              <Printer className="w-4 h-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Print</span>
             </button>
 
             <button
               onClick={onClose}
               aria-label="Close certificate modal"
-              className="p-2 text-slate-300 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+              className="p-2 text-slate-300 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
               title="Close Certificate"
             >
               <X className="w-5 h-5" aria-hidden="true" />

@@ -176,7 +176,7 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
       onSubmitSuccess(savedData);
     } catch (err: any) {
       console.warn('Error saving user registration:', err);
-      setErrorMsg(err.message || 'Failed to complete registration in Firestore. Please verify your details.');
+      setErrorMsg(err.message || 'Failed to complete registration. Please verify your details.');
     } finally {
       setIsSubmitting(false);
     }
@@ -209,7 +209,7 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
             <div>
               <span className="font-bold block text-white text-sm">Registration Complete & Locked</span>
               <p className="mt-0.5 leading-relaxed text-amber-200">
-                Your candidate profile has been stored in the Registration database. As per platform policy, once registered, profile details cannot be modified or re-registered.
+                Your candidate profile has been verified and registered. As per platform policy, once registered, profile details cannot be modified or re-registered.
               </p>
             </div>
           </div>
@@ -279,7 +279,7 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
                   <span>{isAuthLoading ? 'Authenticating Google Account...' : 'Sign In with Google Account'}</span>
                 </button>
                 <p className="text-[11px] text-slate-400">
-                  Authenticate instantly with your Google account to save details in Firestore.
+                  Authenticate instantly with your Google account to verify candidate identity.
                 </p>
               </div>
             )}
@@ -409,7 +409,7 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
               />
             </div>
             <p className="text-[11px] text-slate-400 mt-1">
-              This name will be stored in Firestore Registration database and printed on your Certificate.
+              This name will be printed on your official Certificate.
             </p>
           </div>
 
@@ -523,11 +523,11 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
             <button
               type="submit"
               disabled={isSubmitting}
-              aria-label="Register Profile in Firestore and Start Platform"
+              aria-label="Register Profile and Start Platform"
               className="w-full mt-6 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 text-base font-black py-4 px-6 rounded-2xl shadow-xl shadow-amber-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 border border-amber-300/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             >
               {isSubmitting ? (
-                <span>Checking Uniqueness & Storing in Firestore...</span>
+                <span>Verifying details & completing registration...</span>
               ) : (
                 <>
                   <CheckCircle2 className="w-5 h-5" aria-hidden="true" />

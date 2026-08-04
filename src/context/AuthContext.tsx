@@ -54,14 +54,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const regEmailSnap = await getDocs(regEmailQuery);
         const dupRegEmail = regEmailSnap.docs.find((d) => d.id !== currentUid);
         if (dupRegEmail) {
-          throw new Error(`The Email Address '${cleanEmail}' is already registered in the Registration database. Duplicate registration is strictly prohibited.`);
+          throw new Error(`The Email Address '${cleanEmail}' is already registered. Duplicate registration is strictly prohibited.`);
         }
 
         const userEmailQuery = query(collection(db, 'users'), where('email', '==', cleanEmail));
         const userEmailSnap = await getDocs(userEmailQuery);
         const dupUserEmail = userEmailSnap.docs.find((d) => d.id !== currentUid);
         if (dupUserEmail) {
-          throw new Error(`The Email Address '${cleanEmail}' is already registered in the Registration database. Duplicate registration is strictly prohibited.`);
+          throw new Error(`The Email Address '${cleanEmail}' is already registered. Duplicate registration is strictly prohibited.`);
         }
       }
 
@@ -71,14 +71,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const regMobileSnap = await getDocs(regMobileQuery);
         const dupRegMobile = regMobileSnap.docs.find((d) => d.id !== currentUid);
         if (dupRegMobile) {
-          throw new Error(`The Mobile Number '${cleanMobile}' is already registered in the Registration database. Re-registration with the same mobile number is not allowed.`);
+          throw new Error(`The Mobile Number '${cleanMobile}' is already registered. Re-registration with the same mobile number is not allowed.`);
         }
 
         const userMobileQuery = query(collection(db, 'users'), where('mobile', '==', cleanMobile));
         const userMobileSnap = await getDocs(userMobileQuery);
         const dupUserMobile = userMobileSnap.docs.find((d) => d.id !== currentUid);
         if (dupUserMobile) {
-          throw new Error(`The Mobile Number '${cleanMobile}' is already registered in the Registration database. Re-registration with the same mobile number is not allowed.`);
+          throw new Error(`The Mobile Number '${cleanMobile}' is already registered. Re-registration with the same mobile number is not allowed.`);
         }
       }
     } catch (err: any) {
@@ -243,7 +243,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const saveUserProfile = async (details: Partial<UserDetails>): Promise<UserDetails> => {
     const currentUser = auth.currentUser;
     if (!currentUser) {
-      throw new Error('Candidate must be authenticated with Firebase to complete registration.');
+      throw new Error('Candidate must be authenticated to complete registration.');
     }
 
     // Check if user is already registered and locked
@@ -348,7 +348,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return null;
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
-        throw new Error(`The Email Address '${cleanEmail}' is already registered in Firebase. Duplicate registration is strictly prohibited.`);
+        throw new Error(`The Email Address '${cleanEmail}' is already registered. Duplicate registration is strictly prohibited.`);
       }
       if (err.code === 'auth/weak-password') {
         throw new Error('Password should be at least 6 characters long.');

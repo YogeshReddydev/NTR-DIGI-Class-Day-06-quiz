@@ -12,6 +12,7 @@ import { UserDetails, QuizAttempt } from '../types';
 import { YouTubeBanner } from './YouTubeBanner';
 import { Logo } from './Logo';
 import { useAuth } from '../context/AuthContext';
+import { playNavigationSound } from '../utils/soundEffects';
 
 interface WelcomeScreenProps {
   user: UserDetails;
@@ -165,7 +166,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
               <div className="relative pt-6 mt-6 border-t border-white/10">
                 <button
-                  onClick={() => onSelectLevel(lvl)}
+                  onClick={() => {
+                    playNavigationSound('next');
+                    onSelectLevel(lvl);
+                  }}
                   aria-label={`${bestAttempt ? 'Retake' : 'Start'} Level ${lvl} Quiz`}
                   className={`w-full ${info.btnColor} font-black py-3.5 px-5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer group-hover:scale-[1.02] active:scale-[0.98] border border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950`}
                 >
@@ -186,7 +190,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               <Award className="w-6 h-6 text-amber-400" />
               <div>
                 <h4 className="text-lg font-black text-white">Your Certificate & Attempt History</h4>
-                <p className="text-xs text-slate-300">Stored securely in Firebase Firestore under your account</p>
+                <p className="text-xs text-slate-300">Saved securely under your candidate account</p>
               </div>
             </div>
             <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold px-3 py-1 rounded-full">

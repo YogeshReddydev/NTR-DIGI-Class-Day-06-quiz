@@ -42,13 +42,21 @@ googleProvider.setCustomParameters({
 export async function testFirestoreConnection() {
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.warn('Firebase client is offline. Please check network connection.');
+  } catch (error: any) {
+    const msg = error?.message || String(error);
+    if (
+      msg.includes('offline') ||
+      msg.includes('unavailable') ||
+      msg.includes('Could not reach Cloud Firestore')
+    ) {
+      console.warn('Firestore is currently operating in offline/cached mode or backend is connecting.');
+    } else {
+      console.warn('Firestore initial connection check:', msg);
     }
   }
 }
 
+// Run connection check non-blockingly
 testFirestoreConnection();
 
 // Structured Error Handler for Firestore operations as required by guidelines

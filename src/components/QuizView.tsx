@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, ChevronLeft, ChevronRight, CheckCircle, AlertTriangle, HelpCircle, Shield, ListOrdered } from 'lucide-react';
+import { Clock, ChevronLeft, ChevronRight, CheckCircle, AlertTriangle, Shield, ListOrdered, Volume2, VolumeX } from 'lucide-react';
 import { Question, OptionKey } from '../types';
 import { LEVEL_INFO, QUIZ_TOPIC_TELUGU, QUIZ_TOPIC_ENGLISH } from '../data/quizData';
+import {
+  playOptionSelectSound,
+  playNavigationSound,
+  playSubmitSound,
+  isSoundMuted,
+  setSoundMuted
+} from '../utils/soundEffects';
 
 interface QuizViewProps {
   level: 1 | 2 | 3;
@@ -23,9 +30,19 @@ export const QuizView: React.FC<QuizViewProps> = ({
   const [visited, setVisited] = useState<Set<number>>(new Set([0]));
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME_SECONDS);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [soundMuted, setSoundMutedState] = useState<boolean>(() => isSoundMuted());
 
   const levelInfo = LEVEL_INFO[level];
   const currentQuestion = questions[currentIndex];
+
+  const toggleSound = () => {
+    const nextState = !soundMuted;
+    setSoundMutedState(nextState);
+    setSoundMuted(nextState);
+    if (!nextState) {
+      playOptionSelectSound();
+    }
+  };
 
   // 15-minute countdown timer
   useEffect(() => {
@@ -33,6 +50,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
+          playSubmitSound();
           // Auto submit when time runs out
           onSubmitQuiz(selectedAnswers);
           return 0;
@@ -45,6 +63,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
   }, [selectedAnswers, onSubmitQuiz]);
 
   const handleSelectOption = (optionKey: OptionKey) => {
+    playOptionSelectSound();
     setSelectedAnswers((prev) => ({
       ...prev,
       [currentQuestion.id]: optionKey
@@ -53,6 +72,9 @@ export const QuizView: React.FC<QuizViewProps> = ({
 
   const goToQuestion = (index: number) => {
     if (index >= 0 && index < questions.length) {
+      if (index !== currentIndex) {
+        playNavigationSound(index > currentIndex ? 'next' : 'prev');
+      }
       setCurrentIndex(index);
       setVisited((prev) => new Set(prev).add(index));
     }
@@ -62,6 +84,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
     if (currentIndex < questions.length - 1) {
       goToQuestion(currentIndex + 1);
     } else {
+      playNavigationSound('next');
       setShowSubmitModal(true);
     }
   };
@@ -70,6 +93,11 @@ export const QuizView: React.FC<QuizViewProps> = ({
     if (currentIndex > 0) {
       goToQuestion(currentIndex - 1);
     }
+  };
+
+  const handleConfirmSubmit = () => {
+    playSubmitSound();
+    onSubmitQuiz(selectedAnswers);
   };
 
   const formatTime = (seconds: number) => {
@@ -100,7 +128,21 @@ export const QuizView: React.FC<QuizViewProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 border-white/10 pt-3 sm:pt-0">
+        <div className="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 border-white/10 pt-3 sm:pt-0">
+          {/* Sound Mute Toggle */}
+          <button
+            onClick={toggleSound}
+            aria-label={soundMuted ? 'Unmute Quiz Sound Effects' : 'Mute Quiz Sound Effects'}
+            className={`p-2 rounded-xl border backdrop-blur-md transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
+              soundMuted
+                ? 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
+                : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+            }`}
+            title={soundMuted ? 'Sound Effects Muted (Click to Unmute)' : 'Sound Effects Enabled (Click to Mute)'}
+          >
+            {soundMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+          </button>
+
           {/* Timer */}
           <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border text-sm font-mono font-bold backdrop-blur-md ${
             timeLeft < 180
@@ -347,7 +389,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                 Cancel
               </button>
               <button
-                onClick={() => onSubmitQuiz(selectedAnswers)}
+                onClick={handleConfirmSubmit}
                 aria-label="Confirm and submit quiz answers"
                 className="py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-sm shadow-lg shadow-emerald-500/30 border border-emerald-400/30 transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               >

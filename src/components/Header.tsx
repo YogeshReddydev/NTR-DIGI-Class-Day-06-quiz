@@ -1,7 +1,8 @@
-import React from 'react';
-import { Youtube, Award, LogIn, LogOut, UserCheck, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { Youtube, Award, LogIn, LogOut, UserCheck, ShieldCheck, Volume2, VolumeX } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../context/AuthContext';
+import { isSoundMuted, setSoundMuted, playOptionSelectSound } from '../utils/soundEffects';
 import {
   INSTITUTE_NAME,
   QUIZ_DAY,
@@ -19,6 +20,14 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSignIn }) => {
   const { user, userProfile, signOutUser } = useAuth();
+  const [muted, setMuted] = useState<boolean>(() => isSoundMuted());
+
+  const toggleSound = () => {
+    const next = !muted;
+    setMuted(next);
+    setSoundMuted(next);
+    if (!next) playOptionSelectSound();
+  };
 
   const displayName = userProfile?.fullName || user?.displayName || userName;
   const photoURL = userProfile?.photoURL || user?.photoURL;
@@ -94,7 +103,7 @@ export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSi
                         ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30'
                         : 'bg-white/10 hover:bg-white/20 text-sky-300 hover:text-sky-200'
                     }`}
-                    title={userProfile?.isRegistered ? "Candidate details locked in Firestore" : "Edit candidate details"}
+                    title={userProfile?.isRegistered ? "Candidate profile registered & locked" : "Edit candidate details"}
                   >
                     {userProfile?.isRegistered ? 'Profile 🔒' : 'Edit'}
                   </button>
@@ -103,9 +112,9 @@ export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSi
                 {user && (
                   <button
                     onClick={signOutUser}
-                    aria-label="Sign Out of Firebase Auth Account"
+                    aria-label="Sign Out of Candidate Account"
                     className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-all cursor-pointer ml-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-                    title="Sign Out of Firebase Auth"
+                    title="Sign Out of Account"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                   </button>
@@ -121,6 +130,19 @@ export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSi
                 <span>Sign In / Register</span>
               </button>
             )}
+
+            <button
+              onClick={toggleSound}
+              aria-label={muted ? 'Unmute Sound Effects' : 'Mute Sound Effects'}
+              className={`p-2 rounded-xl border backdrop-blur-md transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
+                muted
+                  ? 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
+                  : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+              }`}
+              title={muted ? 'Sound Effects Muted' : 'Sound Effects Enabled'}
+            >
+              {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            </button>
 
             <a
               href={YOUTUBE_URL}
