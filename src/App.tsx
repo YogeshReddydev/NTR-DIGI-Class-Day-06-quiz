@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UserDetails, ViewState, OptionKey, Question, QuizAttempt } from './types';
 import { QUIZ_QUESTIONS } from './data/quizData';
 import { Header } from './components/Header';
+import { HomeScreen } from './components/HomeScreen';
 import { UserForm } from './components/UserForm';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { QuizView } from './components/QuizView';
@@ -10,10 +11,10 @@ import { CertificateModal } from './components/CertificateModal';
 import { useAuth } from './context/AuthContext';
 
 export default function App() {
-  const { userProfile, loading } = useAuth();
+  const { user, userProfile, loading } = useAuth();
 
   const [localUser, setLocalUser] = useState<UserDetails | null>(null);
-  const [viewState, setViewState] = useState<ViewState>('USER_FORM');
+  const [viewState, setViewState] = useState<ViewState>('HOME');
   const [activeLevel, setActiveLevel] = useState<1 | 2 | 3>(1);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, OptionKey>>({});
   const [activeAttempt, setActiveAttempt] = useState<QuizAttempt | null>(null);
@@ -21,35 +22,20 @@ export default function App() {
 
   // Sync user state with AuthContext userProfile or localStorage
   useEffect(() => {
-    if (userProfile) {
+    if (user && userProfile) {
       setLocalUser(userProfile);
       if (userProfile.isRegistered) {
-        setViewState((prev) => (prev === 'USER_FORM' ? 'WELCOME' : prev));
+        setViewState((prev) => (prev === 'USER_FORM' || prev === 'HOME' ? 'WELCOME' : prev));
       } else {
         setViewState('USER_FORM');
       }
-    } else {
-      try {
-        const stored = localStorage.getItem('ntr_quiz_user');
-        if (stored) {
-          const parsed = JSON.parse(stored) as UserDetails;
-          if (parsed && parsed.isRegistered) {
-            setLocalUser(parsed);
-            setViewState((prev) => (prev === 'USER_FORM' ? 'WELCOME' : prev));
-          } else {
-            setViewState('USER_FORM');
-          }
-        } else {
-          setViewState('USER_FORM');
-        }
-      } catch (e) {
-        console.warn('Failed to restore local user');
-        setViewState('USER_FORM');
-      }
+    } else if (!user) {
+      setLocalUser(null);
+      // Keep on current view state unless navigating explicitly
     }
-  }, [userProfile]);
+  }, [userProfile, user]);
 
-  const effectiveUser = userProfile || localUser;
+  const effectiveUser = user ? (userProfile || localUser) : null;
 
   const handleUserSubmitted = (userData: UserDetails) => {
     setLocalUser(userData);
@@ -98,14 +84,25 @@ export default function App() {
         userName={effectiveUser?.fullName}
         onChangeUser={effectiveUser ? handleChangeUser : undefined}
         onOpenSignIn={() => setViewState('USER_FORM')}
+        onNavigateHome={() => setViewState('HOME')}
       />
 
       {/* Main Content Area */}
       <main className="flex-grow">
+        {viewState === 'HOME' && (
+          <HomeScreen
+            user={effectiveUser}
+            onStartQuiz={() => setViewState(effectiveUser ? 'WELCOME' : 'USER_FORM')}
+            onOpenSignIn={() => setViewState('USER_FORM')}
+            onOpenRegister={() => setViewState('USER_FORM')}
+          />
+        )}
+
         {viewState === 'USER_FORM' && (
           <UserForm
             initialValues={effectiveUser}
             onSubmitSuccess={handleUserSubmitted}
+            onNavigateHome={() => setViewState('HOME')}
           />
         )}
 

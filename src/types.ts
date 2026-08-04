@@ -56,4 +56,4 @@ export interface QuizAttempt {
   createdAt: string;
 }
 
-export type ViewState = 'USER_FORM' | 'WELCOME' | 'QUIZ' | 'RESULTS' | 'CERTIFICATE';
+export type ViewState = 'HOME' | 'USER_FORM' | 'WELCOME' | 'QUIZ' | 'RESULTS' | 'CERTIFICATE';

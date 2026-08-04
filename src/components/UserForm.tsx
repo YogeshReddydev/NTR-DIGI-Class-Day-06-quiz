@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, MapPin, BookOpen, CheckCircle2, AlertCircle, LogIn, ShieldCheck, KeyRound, Lock, UserPlus } from 'lucide-react';
+import { User, Mail, Phone, MapPin, BookOpen, CheckCircle2, AlertCircle, LogIn, ShieldCheck, KeyRound, Lock, UserPlus, ArrowLeft } from 'lucide-react';
 import { UserDetails } from '../types';
 import { INSTITUTE_NAME, QUIZ_DAY } from '../data/quizData';
 import { Logo } from './Logo';
@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 interface UserFormProps {
   initialValues?: UserDetails | null;
   onSubmitSuccess: (user: UserDetails) => void;
+  onNavigateHome?: () => void;
 }
 
 const STATES_LIST = [
@@ -27,7 +28,7 @@ const EXAMS_LIST = [
   'Other'
 ];
 
-export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSuccess }) => {
+export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSuccess, onNavigateHome }) => {
   const { user, userProfile, signInWithGoogle, signUpWithEmail, signInWithEmail, saveUserProfile, signOutUser } = useAuth();
 
   const isLocked = Boolean(userProfile?.isRegistered);
@@ -186,9 +187,20 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
     <div className="max-w-xl mx-auto px-4 py-8 sm:py-12">
       <div className="glass-card rounded-3xl p-6 sm:p-8 relative overflow-hidden bg-slate-900/90 border border-slate-700/60 shadow-2xl">
         
-        {/* Glow background */}
+        {/* Navigation & Glow background */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        {onNavigateHome && (
+          <button
+            type="button"
+            onClick={onNavigateHome}
+            className="mb-4 inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Home Overview</span>
+          </button>
+        )}
 
         <div className="relative text-center mb-6 sm:mb-8 flex flex-col items-center">
           <div className="mb-3">
@@ -287,15 +299,38 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
             {/* Email & Password Auth Form */}
             {authMethod === 'email' && (
               <form onSubmit={handleEmailAuthSubmit} className="space-y-3 pt-1">
-                <div className="flex items-center justify-between text-xs text-slate-300 font-bold mb-1">
-                  <span>{emailMode === 'signup' ? 'Create New Candidate Account' : 'Sign In Existing Account'}</span>
+                {/* Mode Selector for New Users vs Existing Users */}
+                <div className="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs">
                   <button
                     type="button"
-                    onClick={() => setEmailMode(emailMode === 'signup' ? 'signin' : 'signup')}
-                    className="text-amber-400 hover:underline cursor-pointer"
+                    onClick={() => setEmailMode('signup')}
+                    className={`py-2 px-3 font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                      emailMode === 'signup'
+                        ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                    }`}
                   >
-                    {emailMode === 'signup' ? 'Have an account? Sign In' : 'Need account? Create Account'}
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>Create New Account</span>
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setEmailMode('signin')}
+                    className={`py-2 px-3 font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                      emailMode === 'signin'
+                        ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                    }`}
+                  >
+                    <LogIn className="w-3.5 h-3.5" />
+                    <span>Sign In Existing</span>
+                  </button>
+                </div>
+
+                <div className="text-[11px] font-semibold text-slate-300 px-1 pt-0.5">
+                  {emailMode === 'signup'
+                    ? '✨ New candidate? Register with email and password below:'
+                    : '🔑 Registered candidate? Sign in with your credentials:'}
                 </div>
 
                 <div>

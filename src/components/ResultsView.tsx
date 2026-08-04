@@ -7,6 +7,7 @@ import { Question, OptionKey, UserDetails, QuizAttempt } from '../types';
 import { LEVEL_INFO, QUIZ_DAY, QUIZ_TOPIC_TELUGU, QUIZ_TOPIC_ENGLISH } from '../data/quizData';
 import { YouTubeBanner } from './YouTubeBanner';
 import { useAuth } from '../context/AuthContext';
+import { useNetwork } from '../context/NetworkContext';
 
 interface ResultsViewProps {
   user: UserDetails;
@@ -28,8 +29,10 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
   onRetakeLevel
 }) => {
   const [attemptData, setAttemptData] = useState<QuizAttempt | null>(null);
+  const [isBufferedLocally, setIsBufferedLocally] = useState<boolean>(false);
 
   const { fetchUserAttempts } = useAuth();
+  const { saveQuizAttempt } = useNetwork();
 
   useEffect(() => {
     // Calculate score
@@ -87,16 +90,14 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
 
     setAttemptData(attempt);
 
-    // Save to Firestore `quiz_attempts`
-    addDoc(collection(db, 'quiz_attempts'), {
-      ...attempt,
-      timestamp: serverTimestamp()
-    })
-      .then(() => {
+    // Save attempt using network manager (saves to Firestore if online, or buffers locally if offline)
+    saveQuizAttempt(attempt)
+      .then((res) => {
+        setIsBufferedLocally(res.bufferedLocally);
         fetchUserAttempts();
       })
       .catch((err) => {
-        console.warn('Firestore attempt save error:', err);
+        console.warn('Quiz attempt save handler error:', err);
       });
 
     // Trigger confetti if score >= 8
@@ -142,6 +143,13 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
           <p className="text-xs text-slate-300">
             Candidate: <strong className="text-white">{attemptData.fullName}</strong> ({attemptData.examPreparation})
           </p>
+
+          {isBufferedLocally && (
+            <div className="mt-4 p-3 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-200 text-xs font-semibold flex items-center justify-center gap-2 max-w-lg mx-auto backdrop-blur-md animate-pulse">
+              <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              <span>Offline Mode: Result saved locally. It will automatically sync to Firestore when reconnected.</span>
+            </div>
+          )}
         </div>
 
         {/* Score Stats Grid */}

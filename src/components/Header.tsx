@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Youtube, Award, LogIn, LogOut, UserCheck, ShieldCheck, Volume2, VolumeX } from 'lucide-react';
+import { Youtube, Award, LogIn, LogOut, UserCheck, ShieldCheck, Volume2, VolumeX, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../context/AuthContext';
+import { useNetwork } from '../context/NetworkContext';
 import { isSoundMuted, setSoundMuted, playOptionSelectSound } from '../utils/soundEffects';
 import {
   INSTITUTE_NAME,
@@ -16,10 +17,12 @@ interface HeaderProps {
   userName?: string;
   onChangeUser?: () => void;
   onOpenSignIn?: () => void;
+  onNavigateHome?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSignIn }) => {
+export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSignIn, onNavigateHome }) => {
   const { user, userProfile, signOutUser } = useAuth();
+  const { isOnline, pendingBufferCount, isSyncing, syncNow } = useNetwork();
   const [muted, setMuted] = useState<boolean>(() => isSoundMuted());
 
   const toggleSound = () => {
@@ -31,6 +34,7 @@ export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSi
 
   const displayName = userProfile?.fullName || user?.displayName || userName;
   const photoURL = userProfile?.photoURL || user?.photoURL;
+  const isLoggedIn = Boolean(user && displayName);
 
   return (
     <header className="bg-slate-950/60 backdrop-blur-xl border-b border-white/10 shadow-2xl sticky top-0 z-30">
@@ -38,8 +42,12 @@ export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSi
         <div className="flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
           
           {/* Brand & Titles */}
-          <div className="flex items-center gap-3 sm:gap-4 w-full md:w-auto justify-center md:justify-start">
-            <div className="relative flex-shrink-0">
+          <button
+            onClick={onNavigateHome}
+            aria-label="Go to NTR Digi Class Home Page"
+            className="flex items-center gap-3 sm:gap-4 w-full md:w-auto justify-center md:justify-start group text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-2xl p-1"
+          >
+            <div className="relative flex-shrink-0 transform group-hover:scale-105 transition-transform">
               <Logo size="lg" layout="badge-only" />
               <span className="absolute -bottom-1 -right-1 bg-amber-500 text-slate-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow-md">
                 LIVE
@@ -56,7 +64,7 @@ export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSi
                 </span>
               </div>
 
-              <h1 className="text-lg sm:text-xl md:text-2xl font-black tracking-tight text-white mt-1">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-black tracking-tight text-white mt-1 group-hover:text-amber-300 transition-colors">
                 {QUIZ_TOPIC_ENGLISH} <span className="text-amber-400 font-semibold">| {QUIZ_TOPIC_TELUGU}</span>
               </h1>
 
@@ -64,12 +72,12 @@ export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSi
                 {QUIZ_SUBTITLE}
               </p>
             </div>
-          </div>
+          </button>
 
           {/* User Auth Profile Badge & YouTube CTA */}
           <div className="flex flex-wrap items-center justify-center md:justify-end gap-2 sm:gap-3 w-full md:w-auto border-t md:border-t-0 border-white/10 pt-2 md:pt-0">
             
-            {user || displayName ? (
+            {isLoggedIn ? (
               <div className="flex items-center gap-2 bg-slate-900/80 border border-amber-500/30 rounded-2xl p-1.5 pr-3 text-xs text-slate-200 backdrop-blur-md shadow-lg">
                 {photoURL ? (
                   <img
@@ -130,6 +138,47 @@ export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSi
                 <span>Sign In / Register</span>
               </button>
             )}
+
+            {/* Visual Firestore / Network Connection Status Indicator */}
+            <div className="flex items-center">
+              {isOnline ? (
+                pendingBufferCount > 0 ? (
+                  <button
+                    onClick={syncNow}
+                    disabled={isSyncing}
+                    aria-label={`Sync ${pendingBufferCount} pending attempt(s) to Firestore`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/50 text-amber-300 text-xs font-bold transition-all hover:bg-amber-500/30 cursor-pointer shadow-lg animate-pulse focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                    title="Click to sync locally buffered quiz submissions to Firestore database"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${isSyncing ? 'animate-spin' : ''}`} />
+                    <span>Sync ({pendingBufferCount})</span>
+                  </button>
+                ) : (
+                  <div
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold backdrop-blur-md cursor-help"
+                    title="Connected to Firestore database. Quiz submissions sync in real-time."
+                  >
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <Wifi className="w-3.5 h-3.5 text-emerald-400" />
+                    <span className="hidden sm:inline">Online</span>
+                  </div>
+                )
+              ) : (
+                <div
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-bold backdrop-blur-md cursor-help animate-pulse"
+                  title="Network connection lost. Quiz answers are buffered safely in local storage and will auto-sync when connection is restored."
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-400"></span>
+                  </span>
+                  <WifiOff className="w-3.5 h-3.5 text-rose-400" />
+                  <span>{pendingBufferCount > 0 ? `Offline (${pendingBufferCount} Buffered)` : 'Offline (Buffered)'}</span>
+                </div>
+              )}
+            </div>
 
             <button
               onClick={toggleSound}
