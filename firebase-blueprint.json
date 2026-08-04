@@ -12,6 +12,25 @@
         "state": { "type": "string", "description": "Candidate's state" },
         "examPreparation": { "type": "string", "description": "Exam candidate is preparing for (DSC / TET / APPSC)" },
         "photoURL": { "type": "string", "description": "Optional profile photo avatar URL from Auth" },
+        "isRegistered": { "type": "boolean", "description": "Registration lock status" },
+        "createdAt": { "type": "string", "description": "ISO timestamp string when profile created" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp string when profile updated" }
+      },
+      "required": ["uid", "fullName", "email", "mobile", "state", "examPreparation", "createdAt"]
+    },
+    "Registration": {
+      "title": "Registered Candidates",
+      "description": "Official mandatory candidate registration records in Registration collection",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth unique User ID" },
+        "fullName": { "type": "string", "description": "Candidate's full name" },
+        "email": { "type": "string", "description": "Candidate's email address" },
+        "mobile": { "type": "string", "description": "Candidate's 10-digit mobile number" },
+        "state": { "type": "string", "description": "Candidate's state" },
+        "examPreparation": { "type": "string", "description": "Exam candidate is preparing for (DSC / TET / APPSC)" },
+        "photoURL": { "type": "string", "description": "Optional profile photo avatar URL from Auth" },
+        "isRegistered": { "type": "boolean", "description": "Registration lock status" },
         "createdAt": { "type": "string", "description": "ISO timestamp string when profile created" },
         "updatedAt": { "type": "string", "description": "ISO timestamp string when profile updated" }
       },
@@ -46,6 +65,10 @@
     }
   },
   "firestore": {
+    "Registration/{userId}": {
+      "schema": "Registration",
+      "description": "Registered candidate documents stored in Registration collection"
+    },
     "users/{userId}": {
       "schema": "users",
       "description": "User profile document indexed by Auth UID"

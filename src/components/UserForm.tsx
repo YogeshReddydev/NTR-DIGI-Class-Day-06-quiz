@@ -30,6 +30,8 @@ const EXAMS_LIST = [
 export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSuccess }) => {
   const { user, userProfile, signInWithGoogle, saveUserProfile } = useAuth();
 
+  const isLocked = Boolean(userProfile?.isRegistered);
+
   const [fullName, setFullName] = useState(initialValues?.fullName || userProfile?.fullName || user?.displayName || '');
   const [email, setEmail] = useState(initialValues?.email || userProfile?.email || user?.email || '');
   const [mobile, setMobile] = useState(initialValues?.mobile || userProfile?.mobile || '');
@@ -41,7 +43,7 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Update inputs if Auth state or userProfile changes
+  // Sync inputs with Auth state or userProfile
   useEffect(() => {
     if (userProfile) {
       if (userProfile.fullName) setFullName(userProfile.fullName);
@@ -61,10 +63,10 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
     try {
       const loggedInUser = await signInWithGoogle();
       if (loggedInUser) {
-        setSuccessMsg(`Signed in as ${loggedInUser.displayName || loggedInUser.email}! Please verify your mobile and exam details.`);
+        setSuccessMsg(`Authenticated as ${loggedInUser.displayName || loggedInUser.email}! Please enter your mobile number and exam details to complete registration.`);
       }
     } catch (err: any) {
-      setErrorMsg('Google Sign-In failed or was cancelled. You can also manually fill the form.');
+      setErrorMsg('Google Sign-In failed or was cancelled. Please complete the registration form below.');
     } finally {
       setIsGoogleSigningIn(false);
     }
@@ -75,20 +77,37 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
     setErrorMsg('');
     setSuccessMsg('');
 
-    // Validations
+    if (isLocked) {
+      if (userProfile) onSubmitSuccess(userProfile);
+      return;
+    }
+
+    // Strict Mandatory Validations
     const trimmedName = fullName.trim();
     if (!trimmedName || trimmedName.length < 2) {
-      setErrorMsg('Please enter your full name (at least 2 characters).');
+      setErrorMsg('Full Name is mandatory and must be at least 2 characters long.');
       return;
     }
 
-    if (mobile.trim() && !/^[0-9]{10}$/.test(mobile.trim())) {
-      setErrorMsg('Mobile number should be a valid 10-digit number if provided.');
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setErrorMsg('A valid Email Address is mandatory for candidate registration.');
       return;
     }
 
-    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setErrorMsg('Please enter a valid email address if provided.');
+    const trimmedMobile = mobile.trim();
+    if (!trimmedMobile || !/^[0-9]{10}$/.test(trimmedMobile)) {
+      setErrorMsg('A valid 10-digit Mobile Number is mandatory for registration.');
+      return;
+    }
+
+    if (!state) {
+      setErrorMsg('State selection is mandatory.');
+      return;
+    }
+
+    if (!examPreparation) {
+      setErrorMsg('Exam Preparation selection is mandatory.');
       return;
     }
 
@@ -97,46 +116,24 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
     try {
       let savedData: UserDetails;
       if (user) {
-        // Save directly to Firestore via AuthContext
         savedData = await saveUserProfile({
           fullName: trimmedName,
-          email: email.trim() || user.email || 'N/A',
-          mobile: mobile.trim() || 'N/A',
+          email: trimmedEmail,
+          mobile: trimmedMobile,
           state,
           examPreparation
         });
       } else {
-        // Unauthenticated local user fallback details
-        savedData = {
-          fullName: trimmedName,
-          email: email.trim() || 'N/A',
-          mobile: mobile.trim() || 'N/A',
-          state,
-          examPreparation,
-          quizDay: QUIZ_DAY,
-          topic: QUIZ_TOPIC_ENGLISH,
-          createdAt: new Date().toISOString()
-        };
-        localStorage.setItem('ntr_quiz_user', JSON.stringify(savedData));
+        // Fallback or unauthenticated save attempt requiring Google Auth
+        setErrorMsg('Please Sign In with Google Account to save and register your candidate profile in Firestore.');
+        setIsSubmitting(false);
+        return;
       }
 
       onSubmitSuccess(savedData);
-    } catch (err) {
-      console.warn('Error saving user details:', err);
-      setErrorMsg('Failed to save user profile to Firestore. Proceeding locally...');
-      // Fallback submission
-      const fallbackData: UserDetails = {
-        fullName: trimmedName,
-        email: email.trim() || 'N/A',
-        mobile: mobile.trim() || 'N/A',
-        state,
-        examPreparation,
-        quizDay: QUIZ_DAY,
-        topic: QUIZ_TOPIC_ENGLISH,
-        createdAt: new Date().toISOString()
-      };
-      localStorage.setItem('ntr_quiz_user', JSON.stringify(fallbackData));
-      onSubmitSuccess(fallbackData);
+    } catch (err: any) {
+      console.warn('Error saving user registration:', err);
+      setErrorMsg(err.message || 'Failed to complete registration in Firestore. Please verify your details.');
     } finally {
       setIsSubmitting(false);
     }
@@ -146,7 +143,7 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
     <div className="max-w-xl mx-auto px-4 py-8 sm:py-12">
       <div className="glass-card rounded-3xl p-6 sm:p-8 relative overflow-hidden">
         
-        {/* Glow effect */}
+        {/* Glow background */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -158,15 +155,28 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
             Candidate Registration
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 mt-1">
-            Sign in with Google and store your profile on <span className="text-amber-400 font-bold">{INSTITUTE_NAME} {QUIZ_DAY}</span>
+            Official Candidate Registry for <span className="text-amber-400 font-bold">{INSTITUTE_NAME} {QUIZ_DAY}</span>
           </p>
         </div>
 
-        {/* Google Authentication Quick Action */}
+        {/* Locked Registration Banner */}
+        {isLocked && (
+          <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/40 rounded-2xl flex items-start gap-3 text-amber-200 text-xs backdrop-blur-md">
+            <ShieldCheck className="w-6 h-6 text-amber-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <div>
+              <span className="font-bold block text-white text-sm">Registration Complete & Locked</span>
+              <p className="mt-0.5 leading-relaxed text-amber-200">
+                Your candidate profile has been stored in Firestore. As per platform policy, once registered, profile details cannot be modified or re-registered.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Google Authentication Section */}
         {!user ? (
           <div className="mb-6 p-4 bg-slate-900/90 border border-amber-500/30 rounded-2xl text-center space-y-3 backdrop-blur-md">
             <p className="text-xs font-bold text-amber-300 uppercase tracking-wider">
-              Fast Authentication with Firebase
+              Step 1: Sign In with Google
             </p>
             <button
               type="button"
@@ -196,10 +206,10 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
               <span>{isGoogleSigningIn ? 'Signing in with Google...' : 'Sign In with Google Account'}</span>
             </button>
             <p className="text-xs text-slate-300">
-              Auto-syncs your official Certificate of Achievement across all devices!
+              Sign in with your Google email to authenticate and save your details.
             </p>
           </div>
-        ) : (
+        ) : !isLocked ? (
           <div className="mb-6 p-4 bg-emerald-950/40 border border-emerald-500/40 rounded-2xl flex items-center justify-between gap-3 text-emerald-200 text-xs backdrop-blur-md">
             <div className="flex items-center gap-3">
               {user.photoURL ? (
@@ -209,14 +219,14 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
               )}
               <div>
                 <span className="font-bold block text-white text-sm">{user.displayName || user.email}</span>
-                <span className="text-emerald-300 text-xs">Firebase Authenticated Account ({user.email})</span>
+                <span className="text-emerald-300 text-xs">Step 2: Fill mandatory details to complete registration</span>
               </div>
             </div>
             <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">
-              Verified
+              Google Authenticated
             </span>
           </div>
-        )}
+        ) : null}
 
         {errorMsg && (
           <div role="alert" className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl flex items-center gap-3 text-rose-300 text-sm backdrop-blur-md">
@@ -237,7 +247,7 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
           {/* Full Name */}
           <div>
             <label htmlFor="fullNameInput" className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-1.5">
-              Full Name <span className="text-rose-400" aria-hidden="true">*</span>
+              Full Name <span className="text-rose-400" aria-hidden="true">* (Mandatory)</span>
             </label>
             <div className="relative">
               <User className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" aria-hidden="true" />
@@ -246,22 +256,23 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full name"
+                placeholder="Enter candidate full name"
+                disabled={isLocked}
                 required
                 aria-required="true"
                 aria-label="Full Name"
-                className="w-full bg-slate-950/70 border border-white/20 focus:border-amber-400 rounded-xl py-3 pl-11 pr-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 text-sm transition-all backdrop-blur-md"
+                className="w-full bg-slate-950/70 border border-white/20 focus:border-amber-400 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl py-3 pl-11 pr-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 text-sm transition-all backdrop-blur-md"
               />
             </div>
-            <p className="text-xs text-slate-300 mt-1">
-              Note: This name will appear on your official Certificate of Achievement.
+            <p className="text-[11px] text-slate-300 mt-1">
+              This name will be stored in Firestore and printed on your Certificate of Achievement.
             </p>
           </div>
 
           {/* Email Address */}
           <div>
             <label htmlFor="emailInput" className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-1.5">
-              Email Address
+              Email Address <span className="text-rose-400" aria-hidden="true">* (Mandatory & Unique)</span>
             </label>
             <div className="relative">
               <Mail className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" aria-hidden="true" />
@@ -271,8 +282,11 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="e.g. candidate@gmail.com"
+                disabled={isLocked || Boolean(user?.email)}
+                required
+                aria-required="true"
                 aria-label="Email Address"
-                className="w-full bg-slate-950/70 border border-white/20 focus:border-amber-400 rounded-xl py-3 pl-11 pr-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 text-sm transition-all backdrop-blur-md"
+                className="w-full bg-slate-950/70 border border-white/20 focus:border-amber-400 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl py-3 pl-11 pr-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 text-sm transition-all backdrop-blur-md"
               />
             </div>
           </div>
@@ -280,7 +294,7 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
           {/* Mobile Number */}
           <div>
             <label htmlFor="mobileInput" className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-1.5">
-              Mobile Number (10 digits)
+              Mobile Number <span className="text-rose-400" aria-hidden="true">* (Mandatory 10 digits & Unique)</span>
             </label>
             <div className="relative">
               <Phone className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" aria-hidden="true" />
@@ -291,8 +305,11 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
                 onChange={(e) => setMobile(e.target.value)}
                 placeholder="10-digit mobile number"
                 maxLength={10}
+                disabled={isLocked}
+                required
+                aria-required="true"
                 aria-label="10-digit Mobile Number"
-                className="w-full bg-slate-950/70 border border-white/20 focus:border-amber-400 rounded-xl py-3 pl-11 pr-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 text-sm transition-all backdrop-blur-md"
+                className="w-full bg-slate-950/70 border border-white/20 focus:border-amber-400 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl py-3 pl-11 pr-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 text-sm transition-all backdrop-blur-md"
               />
             </div>
           </div>
@@ -301,7 +318,7 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label htmlFor="stateSelect" className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-1.5">
-                State
+                State <span className="text-rose-400" aria-hidden="true">* (Mandatory)</span>
               </label>
               <div className="relative">
                 <MapPin className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" aria-hidden="true" />
@@ -309,8 +326,10 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
                   id="stateSelect"
                   value={state}
                   onChange={(e) => setState(e.target.value)}
+                  disabled={isLocked}
+                  required
                   aria-label="Select Candidate State"
-                  className="w-full bg-slate-950/70 border border-white/20 focus:border-amber-400 rounded-xl py-3 pl-11 pr-8 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 text-sm transition-all appearance-none cursor-pointer backdrop-blur-md"
+                  className="w-full bg-slate-950/70 border border-white/20 focus:border-amber-400 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl py-3 pl-11 pr-8 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 text-sm transition-all appearance-none cursor-pointer backdrop-blur-md"
                 >
                   {STATES_LIST.map((s) => (
                     <option key={s} value={s} className="bg-slate-900 text-white">
@@ -324,7 +343,7 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
             {/* Exam Preparation */}
             <div>
               <label htmlFor="examSelect" className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-1.5">
-                Exam Preparation
+                Exam Preparation <span className="text-rose-400" aria-hidden="true">* (Mandatory)</span>
               </label>
               <div className="relative">
                 <BookOpen className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" aria-hidden="true" />
@@ -332,8 +351,10 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
                   id="examSelect"
                   value={examPreparation}
                   onChange={(e) => setExamPreparation(e.target.value)}
+                  disabled={isLocked}
+                  required
                   aria-label="Select Exam Preparation Type"
-                  className="w-full bg-slate-950/70 border border-white/20 focus:border-amber-400 rounded-xl py-3 pl-11 pr-8 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 text-sm transition-all appearance-none cursor-pointer backdrop-blur-md"
+                  className="w-full bg-slate-950/70 border border-white/20 focus:border-amber-400 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl py-3 pl-11 pr-8 text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 text-sm transition-all appearance-none cursor-pointer backdrop-blur-md"
                 >
                   {EXAMS_LIST.map((e) => (
                     <option key={e} value={e} className="bg-slate-900 text-white">
@@ -345,21 +366,32 @@ export const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmitSucce
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            aria-label="Save Profile and Start Platform"
-            className="w-full mt-6 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 text-base font-black py-4 px-6 rounded-2xl shadow-xl shadow-amber-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 border border-amber-300/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-          >
-            {isSubmitting ? (
-              <span>Storing Details in Firestore...</span>
-            ) : (
-              <>
-                <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
-                <span>Save Profile & Start Platform</span>
-              </>
-            )}
-          </button>
+          {isLocked ? (
+            <button
+              type="button"
+              onClick={() => userProfile && onSubmitSuccess(userProfile)}
+              className="w-full mt-6 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-white text-base font-black py-4 px-6 rounded-2xl shadow-xl shadow-emerald-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 border border-emerald-300/30"
+            >
+              <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
+              <span>Details Saved & Locked — Go to Platform</span>
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              aria-label="Register Profile in Firestore and Start Platform"
+              className="w-full mt-6 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 text-base font-black py-4 px-6 rounded-2xl shadow-xl shadow-amber-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 border border-amber-300/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            >
+              {isSubmitting ? (
+                <span>Checking Uniqueness & Storing in Firestore...</span>
+              ) : (
+                <>
+                  <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
+                  <span>Submit & Register Candidate (Permanent)</span>
+                </>
+              )}
+            </button>
+          )}
         </form>
 
       </div>

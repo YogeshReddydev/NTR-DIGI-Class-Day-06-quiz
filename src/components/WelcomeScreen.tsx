@@ -67,10 +67,12 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             </div>
             <button
               onClick={onChangeUser}
-              aria-label="Change candidate profile details"
-              className="text-xs text-sky-400 hover:text-sky-300 font-semibold underline transition-colors cursor-pointer mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+              aria-label={user.isRegistered ? "View locked candidate profile details" : "Change candidate profile details"}
+              className={`text-xs font-semibold underline transition-colors cursor-pointer mt-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
+                user.isRegistered ? 'text-amber-300 hover:text-amber-200' : 'text-sky-400 hover:text-sky-300'
+              }`}
             >
-              Change Candidate Profile
+              {user.isRegistered ? 'View Profile Details 🔒' : 'Change Candidate Profile'}
             </button>
           </div>
         </div>

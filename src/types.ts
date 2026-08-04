@@ -9,6 +9,7 @@ export interface UserDetails {
   quizDay: string;
   topic: string;
   photoURL?: string;
+  isRegistered?: boolean;
   createdAt: string;
   updatedAt?: string;
 }

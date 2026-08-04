@@ -42,9 +42,17 @@ service cloud.firestore {
     // Users Collection (indexed by Auth UID)
     match /users/{userId} {
       allow get: if isOwner(userId);
-      allow list: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow list: if isSignedIn();
       allow create: if isOwner(userId) && isValidUser(incoming());
-      allow update: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidUser(incoming()) && (existing().isRegistered != true);
+    }
+
+    // Registration Collection (indexed by Auth UID)
+    match /Registration/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if isSignedIn();
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if false; // Strict requirement: Once registered, no details can be changed!
     }
 
     // Quiz Attempts Collection

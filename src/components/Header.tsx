@@ -88,11 +88,15 @@ export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSi
                 {onChangeUser && (
                   <button
                     onClick={onChangeUser}
-                    aria-label="Edit candidate registration details"
-                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-sky-300 hover:text-sky-200 font-bold text-[11px] ml-1 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-                    title="Edit candidate profile"
+                    aria-label={userProfile?.isRegistered ? "View candidate registration profile" : "Register or Edit candidate profile"}
+                    className={`px-2.5 py-1 rounded-lg font-bold text-[11px] ml-1 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
+                      userProfile?.isRegistered
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30'
+                        : 'bg-white/10 hover:bg-white/20 text-sky-300 hover:text-sky-200'
+                    }`}
+                    title={userProfile?.isRegistered ? "Candidate details locked in Firestore" : "Edit candidate details"}
                   >
-                    Edit
+                    {userProfile?.isRegistered ? 'Profile 🔒' : 'Edit'}
                   </button>
                 )}
 

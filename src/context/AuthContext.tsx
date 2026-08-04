@@ -38,45 +38,151 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [userAttempts, setUserAttempts] = useState<QuizAttempt[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Load user profile document from Firestore
+  // Check if Email or Mobile is already registered by another candidate
+  const checkUniqueness = async (email: string, mobile: string, currentUid?: string) => {
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanMobile = mobile.trim();
+
+    try {
+      // 1. Check Email uniqueness in Registration and users collections
+      if (cleanEmail) {
+        const regEmailQuery = query(collection(db, 'Registration'), where('email', '==', cleanEmail));
+        const regEmailSnap = await getDocs(regEmailQuery);
+        const dupRegEmail = regEmailSnap.docs.find((d) => d.id !== currentUid);
+        if (dupRegEmail) {
+          throw new Error(`The Email Address '${cleanEmail}' is already registered in the Registration database. Duplicate registration is strictly prohibited.`);
+        }
+
+        const userEmailQuery = query(collection(db, 'users'), where('email', '==', cleanEmail));
+        const userEmailSnap = await getDocs(userEmailQuery);
+        const dupUserEmail = userEmailSnap.docs.find((d) => d.id !== currentUid);
+        if (dupUserEmail) {
+          throw new Error(`The Email Address '${cleanEmail}' is already registered in the Registration database. Duplicate registration is strictly prohibited.`);
+        }
+      }
+
+      // 2. Check Mobile uniqueness in Registration and users collections
+      if (cleanMobile) {
+        const regMobileQuery = query(collection(db, 'Registration'), where('mobile', '==', cleanMobile));
+        const regMobileSnap = await getDocs(regMobileQuery);
+        const dupRegMobile = regMobileSnap.docs.find((d) => d.id !== currentUid);
+        if (dupRegMobile) {
+          throw new Error(`The Mobile Number '${cleanMobile}' is already registered in the Registration database. Re-registration with the same mobile number is not allowed.`);
+        }
+
+        const userMobileQuery = query(collection(db, 'users'), where('mobile', '==', cleanMobile));
+        const userMobileSnap = await getDocs(userMobileQuery);
+        const dupUserMobile = userMobileSnap.docs.find((d) => d.id !== currentUid);
+        if (dupUserMobile) {
+          throw new Error(`The Mobile Number '${cleanMobile}' is already registered in the Registration database. Re-registration with the same mobile number is not allowed.`);
+        }
+      }
+    } catch (err: any) {
+      if (err.message && err.message.includes('already registered')) {
+        throw err;
+      }
+      console.warn('Firestore uniqueness check query error:', err);
+    }
+  };
+
+  // Load user profile document from Firestore Registration collection
   const loadUserProfile = async (firebaseUser: User) => {
     try {
-      const userRef = doc(db, 'users', firebaseUser.uid);
-      const docSnap = await getDoc(userRef);
+      // Check Registration collection first
+      const regRef = doc(db, 'Registration', firebaseUser.uid);
+      let regSnap = await getDoc(regRef);
 
-      if (docSnap.exists()) {
-        const data = docSnap.data() as UserDetails;
+      if (regSnap.exists()) {
+        const data = regSnap.data() as UserDetails;
+        const isReg = Boolean(data.isRegistered || (data.fullName && data.mobile && data.mobile.length === 10));
         const fullProfile: UserDetails = {
           id: firebaseUser.uid,
           uid: firebaseUser.uid,
           fullName: data.fullName || firebaseUser.displayName || '',
-          email: data.email || firebaseUser.email || '',
+          email: (data.email || firebaseUser.email || '').toLowerCase(),
           mobile: data.mobile || '',
           state: data.state || 'Andhra Pradesh',
           examPreparation: data.examPreparation || 'AP DSC',
           quizDay: data.quizDay || QUIZ_DAY,
           topic: data.topic || QUIZ_TOPIC_ENGLISH,
           photoURL: firebaseUser.photoURL || data.photoURL || '',
+          isRegistered: isReg,
           createdAt: data.createdAt || new Date().toISOString(),
           updatedAt: data.updatedAt || new Date().toISOString()
         };
         setUserProfile(fullProfile);
-        // Sync with localStorage for quick initial render fallback
+        localStorage.setItem('ntr_quiz_user', JSON.stringify(fullProfile));
+        return fullProfile;
+      }
+
+      // Check users collection as fallback
+      const userRef = doc(db, 'users', firebaseUser.uid);
+      let docSnap = await getDoc(userRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data() as UserDetails;
+        const isReg = Boolean(data.isRegistered || (data.fullName && data.mobile && data.mobile.length === 10));
+        const fullProfile: UserDetails = {
+          id: firebaseUser.uid,
+          uid: firebaseUser.uid,
+          fullName: data.fullName || firebaseUser.displayName || '',
+          email: (data.email || firebaseUser.email || '').toLowerCase(),
+          mobile: data.mobile || '',
+          state: data.state || 'Andhra Pradesh',
+          examPreparation: data.examPreparation || 'AP DSC',
+          quizDay: data.quizDay || QUIZ_DAY,
+          topic: data.topic || QUIZ_TOPIC_ENGLISH,
+          photoURL: firebaseUser.photoURL || data.photoURL || '',
+          isRegistered: isReg,
+          createdAt: data.createdAt || new Date().toISOString(),
+          updatedAt: data.updatedAt || new Date().toISOString()
+        };
+        setUserProfile(fullProfile);
         localStorage.setItem('ntr_quiz_user', JSON.stringify(fullProfile));
         return fullProfile;
       } else {
-        // Document doesn't exist yet (New User), create partial template
+        // Check if there is an existing registered user profile by email in Registration collection
+        if (firebaseUser.email) {
+          const cleanEmail = firebaseUser.email.trim().toLowerCase();
+          const qReg = query(collection(db, 'Registration'), where('email', '==', cleanEmail));
+          const regSnapByEmail = await getDocs(qReg);
+          if (!regSnapByEmail.empty) {
+            const existingDoc = regSnapByEmail.docs[0];
+            const data = existingDoc.data() as UserDetails;
+            const fullProfile: UserDetails = {
+              id: existingDoc.id,
+              uid: firebaseUser.uid,
+              fullName: data.fullName || firebaseUser.displayName || '',
+              email: (data.email || firebaseUser.email).toLowerCase(),
+              mobile: data.mobile || '',
+              state: data.state || 'Andhra Pradesh',
+              examPreparation: data.examPreparation || 'AP DSC',
+              quizDay: data.quizDay || QUIZ_DAY,
+              topic: data.topic || QUIZ_TOPIC_ENGLISH,
+              photoURL: firebaseUser.photoURL || data.photoURL || '',
+              isRegistered: Boolean(data.isRegistered || (data.fullName && data.mobile)),
+              createdAt: data.createdAt || new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+            setUserProfile(fullProfile);
+            localStorage.setItem('ntr_quiz_user', JSON.stringify(fullProfile));
+            return fullProfile;
+          }
+        }
+
+        // New User template (needs to complete mandatory mobile, state, exam prep)
         const newProfile: UserDetails = {
           id: firebaseUser.uid,
           uid: firebaseUser.uid,
           fullName: firebaseUser.displayName || '',
-          email: firebaseUser.email || '',
+          email: (firebaseUser.email || '').toLowerCase(),
           mobile: '',
           state: 'Andhra Pradesh',
           examPreparation: 'AP DSC',
           quizDay: QUIZ_DAY,
           topic: QUIZ_TOPIC_ENGLISH,
           photoURL: firebaseUser.photoURL || '',
+          isRegistered: false,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
@@ -85,18 +191,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     } catch (err) {
       console.warn('Error loading user profile from Firestore:', err);
-      // Fallback
       const fallbackProfile: UserDetails = {
         id: firebaseUser.uid,
         uid: firebaseUser.uid,
         fullName: firebaseUser.displayName || '',
-        email: firebaseUser.email || '',
+        email: (firebaseUser.email || '').toLowerCase(),
         mobile: '',
         state: 'Andhra Pradesh',
         examPreparation: 'AP DSC',
         quizDay: QUIZ_DAY,
         topic: QUIZ_TOPIC_ENGLISH,
         photoURL: firebaseUser.photoURL || '',
+        isRegistered: false,
         createdAt: new Date().toISOString()
       };
       setUserProfile(fallbackProfile);
@@ -133,34 +239,70 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const saveUserProfile = async (details: Partial<UserDetails>): Promise<UserDetails> => {
     const currentUser = auth.currentUser;
     if (!currentUser) {
-      throw new Error('User must be logged in to save profile details.');
+      throw new Error('Candidate must be authenticated with Firebase to complete registration.');
     }
+
+    // Check if user is already registered and locked
+    if (userProfile?.isRegistered) {
+      throw new Error('Registration Complete: Candidate profile details are locked and cannot be modified once registered.');
+    }
+
+    const cleanName = (details.fullName || userProfile?.fullName || currentUser.displayName || '').trim();
+    const cleanEmail = (details.email || userProfile?.email || currentUser.email || '').trim().toLowerCase();
+    const cleanMobile = (details.mobile || userProfile?.mobile || '').trim();
+    const cleanState = details.state || userProfile?.state || 'Andhra Pradesh';
+    const cleanExam = details.examPreparation || userProfile?.examPreparation || 'AP DSC';
+
+    // Mandatory Field Validation
+    if (!cleanName || cleanName.length < 2) {
+      throw new Error('Full Name is mandatory and must be at least 2 characters long.');
+    }
+    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      throw new Error('A valid Email Address is mandatory for candidate registration.');
+    }
+    if (!cleanMobile || !/^[0-9]{10}$/.test(cleanMobile)) {
+      throw new Error('A valid 10-digit Mobile Number is mandatory for candidate registration.');
+    }
+    if (!cleanState) {
+      throw new Error('State selection is mandatory.');
+    }
+    if (!cleanExam) {
+      throw new Error('Exam Preparation selection is mandatory.');
+    }
+
+    // Check uniqueness of Email and Mobile Number in Firestore
+    await checkUniqueness(cleanEmail, cleanMobile, currentUser.uid);
 
     const now = new Date().toISOString();
     const updatedProfile: UserDetails = {
       id: currentUser.uid,
       uid: currentUser.uid,
-      fullName: (details.fullName || userProfile?.fullName || currentUser.displayName || '').trim(),
-      email: (details.email || userProfile?.email || currentUser.email || '').trim(),
-      mobile: (details.mobile || userProfile?.mobile || '').trim(),
-      state: details.state || userProfile?.state || 'Andhra Pradesh',
-      examPreparation: details.examPreparation || userProfile?.examPreparation || 'AP DSC',
+      fullName: cleanName,
+      email: cleanEmail,
+      mobile: cleanMobile,
+      state: cleanState,
+      examPreparation: cleanExam,
       quizDay: QUIZ_DAY,
       topic: QUIZ_TOPIC_ENGLISH,
       photoURL: currentUser.photoURL || userProfile?.photoURL || '',
+      isRegistered: true, // Permanent lock flag
       createdAt: userProfile?.createdAt || now,
       updatedAt: now
     };
 
+    const regRef = doc(db, 'Registration', currentUser.uid);
     const userRef = doc(db, 'users', currentUser.uid);
 
     try {
+      // Primary store: Registration database collection
+      await setDoc(regRef, updatedProfile);
+      // Sync store: users collection
       await setDoc(userRef, updatedProfile, { merge: true });
       setUserProfile(updatedProfile);
       localStorage.setItem('ntr_quiz_user', JSON.stringify(updatedProfile));
       return updatedProfile;
     } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, `users/${currentUser.uid}`);
+      handleFirestoreError(error, OperationType.WRITE, `Registration/${currentUser.uid}`);
       throw error;
     }
   };
