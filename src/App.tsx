@@ -21,21 +21,30 @@ export default function App() {
 
   // Sync user state with AuthContext userProfile or localStorage
   useEffect(() => {
-    if (userProfile && userProfile.fullName) {
+    if (userProfile) {
       setLocalUser(userProfile);
-      setViewState((prev) => (prev === 'USER_FORM' ? 'WELCOME' : prev));
+      if (userProfile.isRegistered) {
+        setViewState((prev) => (prev === 'USER_FORM' ? 'WELCOME' : prev));
+      } else {
+        setViewState('USER_FORM');
+      }
     } else {
       try {
         const stored = localStorage.getItem('ntr_quiz_user');
         if (stored) {
           const parsed = JSON.parse(stored) as UserDetails;
-          if (parsed && parsed.fullName) {
+          if (parsed && parsed.isRegistered) {
             setLocalUser(parsed);
             setViewState((prev) => (prev === 'USER_FORM' ? 'WELCOME' : prev));
+          } else {
+            setViewState('USER_FORM');
           }
+        } else {
+          setViewState('USER_FORM');
         }
       } catch (e) {
         console.warn('Failed to restore local user');
+        setViewState('USER_FORM');
       }
     }
   }, [userProfile]);

@@ -3,7 +3,9 @@ import {
   User,
   onAuthStateChanged,
   signInWithPopup,
-  signOut as firebaseSignOut
+  signOut as firebaseSignOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
 } from 'firebase/auth';
 import {
   doc,
@@ -24,6 +26,8 @@ interface AuthContextType {
   userProfile: UserDetails | null;
   loading: boolean;
   signInWithGoogle: () => Promise<User | null>;
+  signUpWithEmail: (email: string, pass: string) => Promise<User | null>;
+  signInWithEmail: (email: string, pass: string) => Promise<User | null>;
   signOutUser: () => Promise<void>;
   saveUserProfile: (details: Partial<UserDetails>) => Promise<UserDetails>;
   userAttempts: QuizAttempt[];
@@ -324,6 +328,58 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  // Email & Password Sign Up
+  const signUpWithEmail = async (emailStr: string, pass: string): Promise<User | null> => {
+    const cleanEmail = emailStr.trim().toLowerCase();
+    if (!cleanEmail) throw new Error('Email address is required.');
+    if (!pass || pass.length < 6) throw new Error('Password must be at least 6 characters long.');
+
+    // Check uniqueness in Registration database prior to account creation
+    await checkUniqueness(cleanEmail, '');
+
+    try {
+      const result = await createUserWithEmailAndPassword(auth, cleanEmail, pass);
+      if (result.user) {
+        setUser(result.user);
+        await loadUserProfile(result.user);
+        await fetchUserAttempts();
+        return result.user;
+      }
+      return null;
+    } catch (err: any) {
+      if (err.code === 'auth/email-already-in-use') {
+        throw new Error(`The Email Address '${cleanEmail}' is already registered in Firebase. Duplicate registration is strictly prohibited.`);
+      }
+      if (err.code === 'auth/weak-password') {
+        throw new Error('Password should be at least 6 characters long.');
+      }
+      throw new Error(err.message || 'Failed to create candidate account. Please verify credentials.');
+    }
+  };
+
+  // Email & Password Sign In
+  const signInWithEmail = async (emailStr: string, pass: string): Promise<User | null> => {
+    const cleanEmail = emailStr.trim().toLowerCase();
+    if (!cleanEmail) throw new Error('Email address is required.');
+    if (!pass) throw new Error('Password is required.');
+
+    try {
+      const result = await signInWithEmailAndPassword(auth, cleanEmail, pass);
+      if (result.user) {
+        setUser(result.user);
+        await loadUserProfile(result.user);
+        await fetchUserAttempts();
+        return result.user;
+      }
+      return null;
+    } catch (err: any) {
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        throw new Error('Invalid email or password. If you do not have an account, please select Create New Account.');
+      }
+      throw new Error(err.message || 'Failed to sign in with email and password.');
+    }
+  };
+
   // Sign Out
   const signOutUser = async () => {
     try {
@@ -363,6 +419,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         userProfile,
         loading,
         signInWithGoogle,
+        signUpWithEmail,
+        signInWithEmail,
         signOutUser,
         saveUserProfile,
         userAttempts,
