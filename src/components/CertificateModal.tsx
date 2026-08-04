@@ -17,21 +17,47 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
 
   const levelInfo = LEVEL_INFO[attempt.level];
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
-  // Download certificate strictly as PDF document (no questions or extra UI)
+  // Helper to capture certificate element safely across devices
+  const generateCanvas = async () => {
+    if (!certificateRef.current) throw new Error('Certificate element not found');
+
+    return await html2canvas(certificateRef.current, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#0f172a',
+      logging: false,
+      windowWidth: 1200,
+      onclone: (clonedDoc) => {
+        // Fix any CSS text-transparent/bg-clip-text issues in cloned DOM for html2canvas
+        const transparentElements = clonedDoc.querySelectorAll('.text-transparent');
+        transparentElements.forEach((el) => {
+          (el as HTMLElement).style.color = '#fcd34d'; // amber-300
+          (el as HTMLElement).style.webkitBackgroundClip = 'unset';
+          (el as HTMLElement).style.backgroundClip = 'unset';
+          (el as HTMLElement).style.backgroundImage = 'none';
+        });
+
+        // Ensure proper dimensions without transforms
+        const certCard = clonedDoc.querySelector('[data-certificate-card]') as HTMLElement;
+        if (certCard) {
+          certCard.style.transform = 'none';
+          certCard.style.margin = '0 auto';
+        }
+      }
+    });
+  };
+
+  // Download certificate strictly as PDF document
   const handleDownloadPDF = async () => {
-    if (!certificateRef.current) return;
+    setDownloadError(null);
     setIsDownloadingPDF(true);
 
     try {
-      const canvas = await html2canvas(certificateRef.current, {
-        scale: 3, // High DPI for crisp vector-like text
-        useCORS: true,
-        backgroundColor: '#0f172a',
-        logging: false
-      });
-
-      const imgData = canvas.toDataURL('image/png');
+      const canvas = await generateCanvas();
+      const imgData = canvas.toDataURL('image/png', 1.0);
 
       // Create landscape PDF matching A4 standard dimensions
       const pdf = new jsPDF({
@@ -47,6 +73,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
       pdf.save(`NTR_Digi_Class_Certificate_${attempt.fullName.replace(/\s+/g, '_')}_Level${attempt.level}.pdf`);
     } catch (err) {
       console.error('Certificate PDF export error:', err);
+      setDownloadError('Unable to generate PDF. Please try the PNG Image button or Print option.');
     } finally {
       setIsDownloadingPDF(false);
     }
@@ -54,24 +81,23 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
 
   // Download certificate as PNG image
   const handleDownloadImage = async () => {
-    if (!certificateRef.current) return;
+    setDownloadError(null);
     setIsDownloadingImage(true);
 
     try {
-      const canvas = await html2canvas(certificateRef.current, {
-        scale: 3,
-        useCORS: true,
-        backgroundColor: '#0f172a',
-        logging: false
-      });
-
-      const image = canvas.toDataURL('image/png');
+      const canvas = await generateCanvas();
+      const image = canvas.toDataURL('image/png', 1.0);
       const link = document.createElement('a');
       link.href = image;
       link.download = `NTR_Digi_Class_Certificate_${attempt.fullName.replace(/\s+/g, '_')}_Level${attempt.level}.png`;
+      document.body.appendChild(link);
       link.click();
+      setTimeout(() => {
+        document.body.removeChild(link);
+      }, 100);
     } catch (err) {
       console.error('Certificate canvas export error:', err);
+      setDownloadError('Unable to generate PNG image. Please use the PDF button or Print option.');
     } finally {
       setIsDownloadingImage(false);
     }
@@ -141,10 +167,21 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
           </div>
         </div>
 
+        {/* Error Alert if Download fails */}
+        {downloadError && (
+          <div role="alert" className="mx-4 sm:mx-8 mt-4 p-3 bg-rose-950/80 border border-rose-500/50 rounded-xl text-rose-200 text-xs flex items-center justify-between">
+            <span>{downloadError}</span>
+            <button onClick={() => setDownloadError(null)} className="text-slate-400 hover:text-white text-xs underline">
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {/* Printable Certificate Template Card */}
         <div className="p-4 sm:p-8 overflow-x-auto">
           <div
             ref={certificateRef}
+            data-certificate-card="true"
             className="w-[800px] h-[580px] mx-auto bg-slate-950 text-white rounded-3xl p-8 border-8 border-double border-amber-500/60 relative flex flex-col justify-between shadow-2xl overflow-hidden select-none print:w-full print:h-auto print:border-amber-600 print:text-black print:bg-white"
             style={{
               fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif"
@@ -173,7 +210,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
                 <span className="h-0.5 w-12 bg-amber-500/60" />
               </div>
 
-              <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 uppercase tracking-wider print:text-amber-700">
+              <h1 className="text-3xl font-black text-amber-300 uppercase tracking-wider print:text-amber-700">
                 Certificate of Achievement
               </h1>
 
