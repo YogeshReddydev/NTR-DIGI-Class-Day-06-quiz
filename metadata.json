@@ -1,0 +1,6 @@
+{
+  "name": "NTR Digi Class - Day 06 Live Quiz",
+  "description": "Interactive online quiz platform for AP & TS TET / DSC Social Methodology - History Teaching Methods with levels, certificate generation, and Firestore database integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

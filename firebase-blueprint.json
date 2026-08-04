@@ -1,0 +1,58 @@
+{
+  "entities": {
+    "users": {
+      "title": "User Profiles",
+      "description": "Authenticated user profile details for candidates registered on NTR Digi Class",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth unique User ID" },
+        "fullName": { "type": "string", "description": "Candidate's full name" },
+        "email": { "type": "string", "description": "Candidate's email address" },
+        "mobile": { "type": "string", "description": "Candidate's 10-digit mobile number" },
+        "state": { "type": "string", "description": "Candidate's state" },
+        "examPreparation": { "type": "string", "description": "Exam candidate is preparing for (DSC / TET / APPSC)" },
+        "photoURL": { "type": "string", "description": "Optional profile photo avatar URL from Auth" },
+        "createdAt": { "type": "string", "description": "ISO timestamp string when profile created" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp string when profile updated" }
+      },
+      "required": ["uid", "fullName", "email", "mobile", "state", "examPreparation", "createdAt"]
+    },
+    "quiz_attempts": {
+      "title": "Quiz Attempts",
+      "description": "Quiz submission attempts and scores linked to candidate UID",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of candidate" },
+        "fullName": { "type": "string", "description": "Candidate full name" },
+        "email": { "type": "string", "description": "Candidate email" },
+        "mobile": { "type": "string", "description": "Candidate mobile number" },
+        "examPreparation": { "type": "string", "description": "Exam preparation choice" },
+        "quizDay": { "type": "string", "description": "Quiz Day identifier" },
+        "topic": { "type": "string", "description": "Topic name" },
+        "level": { "type": "number", "description": "Quiz level (1, 2, or 3)" },
+        "score": { "type": "number", "description": "Number of correct answers" },
+        "totalQuestions": { "type": "number", "description": "Total questions in quiz" },
+        "percentage": { "type": "number", "description": "Score percentage" },
+        "correctAnswers": { "type": "number", "description": "Count of correct answers" },
+        "incorrectAnswers": { "type": "number", "description": "Count of incorrect answers" },
+        "selectedAnswers": { "type": "object", "description": "Record of question id to user selected answer option" },
+        "completionDate": { "type": "string", "description": "Completion date string" },
+        "completionTime": { "type": "string", "description": "Completion time string" },
+        "certificateEligible": { "type": "boolean", "description": "Whether eligible for official certificate" },
+        "certificateId": { "type": "string", "description": "Unique certificate ID" },
+        "createdAt": { "type": "string", "description": "Timestamp ISO string" }
+      },
+      "required": ["userId", "fullName", "email", "quizDay", "topic", "level", "score", "totalQuestions", "percentage", "certificateEligible", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "users",
+      "description": "User profile document indexed by Auth UID"
+    },
+    "quiz_attempts/{attemptId}": {
+      "schema": "quiz_attempts",
+      "description": "Individual quiz attempts indexed by document ID"
+    }
+  }
+}
