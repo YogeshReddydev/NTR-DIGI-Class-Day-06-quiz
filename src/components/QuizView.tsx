@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, ChevronLeft, ChevronRight, CheckCircle, AlertTriangle, Shield, ListOrdered, Volume2, VolumeX } from 'lucide-react';
 import { Question, OptionKey } from '../types';
-import { LEVEL_INFO, QUIZ_TOPIC_TELUGU, QUIZ_TOPIC_ENGLISH } from '../data/quizData';
+import { LEVEL_INFO, QUIZ_DAY, QUIZ_TOPIC_TELUGU, QUIZ_TOPIC_ENGLISH } from '../data/quizData';
 import {
   playOptionSelectSound,
   playNavigationSound,
@@ -13,6 +13,9 @@ import {
 interface QuizViewProps {
   level: 1 | 2 | 3;
   questions: Question[];
+  quizDay?: string;
+  topicTelugu?: string;
+  topicEnglish?: string;
   onSubmitQuiz: (selectedAnswers: Record<number, OptionKey>) => void;
   onExitQuiz: () => void;
 }
@@ -22,6 +25,9 @@ const TOTAL_TIME_SECONDS = 15 * 60; // 15 minutes = 900 seconds
 export const QuizView: React.FC<QuizViewProps> = ({
   level,
   questions,
+  quizDay = QUIZ_DAY,
+  topicTelugu = QUIZ_TOPIC_TELUGU,
+  topicEnglish = QUIZ_TOPIC_ENGLISH,
   onSubmitQuiz,
   onExitQuiz
 }) => {
@@ -119,11 +125,12 @@ export const QuizView: React.FC<QuizViewProps> = ({
             Level {level} Quiz
           </span>
           <div>
-            <h2 className="text-sm font-bold text-white">
-              {QUIZ_TOPIC_ENGLISH}
+            <h2 className="text-sm font-bold text-white flex items-center gap-2">
+              <span className="text-xs font-black text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/30">{quizDay}</span>
+              <span>{topicEnglish}</span>
             </h2>
             <p className="text-xs text-amber-400 font-medium">
-              {QUIZ_TOPIC_TELUGU}
+              {topicTelugu}
             </p>
           </div>
         </div>

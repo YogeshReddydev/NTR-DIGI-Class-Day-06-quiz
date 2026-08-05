@@ -9,11 +9,14 @@ import {
   QUIZ_TOPIC_TELUGU,
   QUIZ_SUBTITLE,
   YOUTUBE_URL,
-  LEVEL_INFO
+  LEVEL_INFO,
+  ALL_QUIZ_DAYS
 } from '../data/quizData';
 
 interface HomeScreenProps {
   user: UserDetails | null;
+  selectedDay?: string;
+  onSelectDay?: (day: string) => void;
   onStartQuiz: () => void;
   onOpenSignIn: () => void;
   onOpenRegister: () => void;
@@ -21,10 +24,14 @@ interface HomeScreenProps {
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   user,
+  selectedDay = 'DAY 07',
+  onSelectDay,
   onStartQuiz,
   onOpenSignIn,
   onOpenRegister
 }) => {
+  const activeDayData = ALL_QUIZ_DAYS[selectedDay] || ALL_QUIZ_DAYS['DAY 07'];
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 sm:py-12 space-y-12 animate-fadeIn">
       
@@ -41,24 +48,45 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <Logo size="lg" className="shadow-2xl shadow-amber-500/20" />
           </div>
 
+          {/* Day Selector Buttons */}
+          <div className="flex items-center justify-center gap-2 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 shadow-inner">
+            {Object.keys(ALL_QUIZ_DAYS).map((dayKey) => {
+              const isSelected = selectedDay === dayKey;
+              return (
+                <button
+                  key={dayKey}
+                  onClick={() => onSelectDay && onSelectDay(dayKey)}
+                  className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md scale-105'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+                  }`}
+                >
+                  <span>{dayKey}</span>
+                  {dayKey === 'DAY 07' && <span className="text-[10px] bg-amber-950/60 text-amber-300 px-1.5 py-0.5 rounded font-bold border border-amber-500/40">NEW</span>}
+                </button>
+              );
+            })}
+          </div>
+
           {/* Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
             <span className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 text-amber-300 text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-md flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              {QUIZ_DAY} LIVE QUIZ
+              {activeDayData.quizDay} LIVE EXAMINATION
             </span>
             <span className="bg-slate-800/80 border border-slate-700 text-slate-300 text-xs font-bold px-3.5 py-1.5 rounded-full">
-              {QUIZ_SUBTITLE}
+              {activeDayData.subtitle}
             </span>
           </div>
 
           {/* Main Topic Heading */}
           <div className="space-y-3">
             <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-              {QUIZ_TOPIC_TELUGU}
+              {activeDayData.topicTelugu}
             </h1>
             <h2 className="text-lg sm:text-2xl font-bold text-amber-400 tracking-wide">
-              {QUIZ_TOPIC_ENGLISH}
+              {activeDayData.topicEnglish}
             </h2>
           </div>
 

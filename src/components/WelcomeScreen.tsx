@@ -6,7 +6,8 @@ import {
   QUIZ_TOPIC_TELUGU,
   QUIZ_TOPIC_ENGLISH,
   QUIZ_SUBTITLE,
-  LEVEL_INFO
+  LEVEL_INFO,
+  ALL_QUIZ_DAYS
 } from '../data/quizData';
 import { UserDetails, QuizAttempt } from '../types';
 import { YouTubeBanner } from './YouTubeBanner';
@@ -16,6 +17,8 @@ import { playNavigationSound } from '../utils/soundEffects';
 
 interface WelcomeScreenProps {
   user: UserDetails;
+  selectedDay?: string;
+  onSelectDay?: (day: string) => void;
   onSelectLevel: (level: 1 | 2 | 3) => void;
   onChangeUser: () => void;
   onViewCertificate?: (attempt: QuizAttempt) => void;
@@ -23,11 +26,14 @@ interface WelcomeScreenProps {
 
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   user,
+  selectedDay = 'DAY 07',
+  onSelectDay,
   onSelectLevel,
   onChangeUser,
   onViewCertificate
 }) => {
   const { userAttempts } = useAuth();
+  const activeDayData = ALL_QUIZ_DAYS[selectedDay] || ALL_QUIZ_DAYS['DAY 07'];
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 sm:py-10 space-y-8">
@@ -80,16 +86,37 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       </div>
 
       {/* Quiz Details Banner */}
-      <div className="text-center space-y-3">
+      <div className="text-center space-y-4">
+        {/* Day Selector Buttons */}
+        <div className="inline-flex items-center justify-center gap-2 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 shadow-inner">
+          {Object.keys(ALL_QUIZ_DAYS).map((dayKey) => {
+            const isSelected = selectedDay === dayKey;
+            return (
+              <button
+                key={dayKey}
+                onClick={() => onSelectDay && onSelectDay(dayKey)}
+                className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md scale-105'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+                }`}
+              >
+                <span>{dayKey}</span>
+                {dayKey === 'DAY 07' && <span className="text-[10px] bg-amber-950/60 text-amber-300 px-1.5 py-0.5 rounded font-bold border border-amber-500/40">LIVE</span>}
+              </button>
+            );
+          })}
+        </div>
+
         <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-slate-100 text-xs font-bold px-4 py-1.5 rounded-full backdrop-blur-md">
-          <BookOpen className="w-4 h-4 text-sky-400" aria-hidden="true" />
-          <span>{QUIZ_DAY} LIVE EXAMINATION PLATFORM</span>
+          <BookOpen className="w-4 h-4 text-amber-400" aria-hidden="true" />
+          <span>{activeDayData.quizDay} LIVE EXAMINATION PLATFORM</span>
         </div>
         <h3 className="text-2xl sm:text-3xl font-black text-white">
-          {QUIZ_TOPIC_ENGLISH} | {QUIZ_TOPIC_TELUGU}
+          {activeDayData.topicEnglish} | {activeDayData.topicTelugu}
         </h3>
         <p className="text-sm text-slate-200 max-w-2xl mx-auto leading-relaxed">
-          Choose a level below to begin your live test. Complete 10 questions per level. Score 8 or more out of 10 to earn your official <strong className="text-amber-400">{INSTITUTE_NAME} Level Certificate</strong>!
+          Select a difficulty level below to begin your <strong className="text-amber-300">{activeDayData.quizDay}</strong> exam. Complete 10 questions per level. Score 8 or more out of 10 to earn your official <strong className="text-amber-400">{INSTITUTE_NAME} Level Certificate</strong>!
         </p>
       </div>
 

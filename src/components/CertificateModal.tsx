@@ -215,7 +215,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
               </h1>
 
               <p className="text-xs text-slate-400 uppercase tracking-widest font-bold">
-                {QUIZ_DAY} LIVE QUIZ — SOCIAL METHODOLOGY
+                {attempt.quizDay || QUIZ_DAY} LIVE QUIZ — SOCIAL METHODOLOGY
               </p>
             </div>
 
@@ -232,7 +232,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
               </div>
 
               <p className="text-xs text-slate-300 max-w-xl mx-auto leading-relaxed pt-2">
-                for successfully completing the live examination on <strong className="text-amber-300">{QUIZ_TOPIC_ENGLISH} ({QUIZ_TOPIC_TELUGU})</strong> conducted by {INSTITUTE_NAME} for {attempt.examPreparation} preparation.
+                for successfully completing the live examination on <strong className="text-amber-300">{attempt.topic || QUIZ_TOPIC_ENGLISH}</strong> conducted by {INSTITUTE_NAME} for {attempt.examPreparation} preparation.
               </p>
             </div>
 

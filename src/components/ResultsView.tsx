@@ -14,6 +14,9 @@ interface ResultsViewProps {
   level: 1 | 2 | 3;
   questions: Question[];
   selectedAnswers: Record<number, OptionKey>;
+  quizDay?: string;
+  topicTelugu?: string;
+  topicEnglish?: string;
   onGenerateCertificate: (attempt: QuizAttempt) => void;
   onSelectAnotherLevel: () => void;
   onRetakeLevel: () => void;
@@ -24,6 +27,9 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
   level,
   questions,
   selectedAnswers,
+  quizDay = QUIZ_DAY,
+  topicTelugu = QUIZ_TOPIC_TELUGU,
+  topicEnglish = QUIZ_TOPIC_ENGLISH,
   onGenerateCertificate,
   onSelectAnotherLevel,
   onRetakeLevel
@@ -60,9 +66,10 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
       hour12: true
     });
 
-    // Unique Certificate ID generator: e.g. NTRDC-D06-L1-7F892
+    // Unique Certificate ID generator: e.g. NTRDC-DAY07-L1-7F892
+    const dayCode = quizDay.replace(/\s+/g, '');
     const randomHex = Math.random().toString(36).substring(2, 7).toUpperCase();
-    const certificateId = `NTRDC-D06-L${level}-${randomHex}`;
+    const certificateId = `NTRDC-${dayCode}-L${level}-${randomHex}`;
 
     const currentUserId = user.uid || user.id || auth.currentUser?.uid || 'anonymous';
 
@@ -72,8 +79,8 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
       email: user.email,
       mobile: user.mobile,
       examPreparation: user.examPreparation,
-      quizDay: QUIZ_DAY,
-      topic: QUIZ_TOPIC_ENGLISH,
+      quizDay: quizDay,
+      topic: topicEnglish,
       level,
       score: correctCount,
       totalQuestions,

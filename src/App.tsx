@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UserDetails, ViewState, OptionKey, Question, QuizAttempt } from './types';
-import { QUIZ_QUESTIONS } from './data/quizData';
+import { ALL_QUIZ_DAYS } from './data/quizData';
 import { Header } from './components/Header';
 import { HomeScreen } from './components/HomeScreen';
 import { UserForm } from './components/UserForm';
@@ -13,6 +13,7 @@ import { useAuth } from './context/AuthContext';
 export default function App() {
   const { user, userProfile, loading } = useAuth();
 
+  const [selectedDay, setSelectedDay] = useState<string>('DAY 07');
   const [localUser, setLocalUser] = useState<UserDetails | null>(null);
   const [viewState, setViewState] = useState<ViewState>('HOME');
   const [activeLevel, setActiveLevel] = useState<1 | 2 | 3>(1);
@@ -64,8 +65,9 @@ export default function App() {
     setViewState('USER_FORM');
   };
 
-  // Filter questions for active level
-  const activeQuestions = QUIZ_QUESTIONS.filter((q) => q.level === activeLevel);
+  // Get active day data and filter questions for active level
+  const activeDayData = ALL_QUIZ_DAYS[selectedDay] || ALL_QUIZ_DAYS['DAY 07'];
+  const activeQuestions = activeDayData.questions.filter((q) => q.level === activeLevel);
 
   if (loading) {
     return (
@@ -92,6 +94,8 @@ export default function App() {
         {viewState === 'HOME' && (
           <HomeScreen
             user={effectiveUser}
+            selectedDay={selectedDay}
+            onSelectDay={setSelectedDay}
             onStartQuiz={() => setViewState(effectiveUser ? 'WELCOME' : 'USER_FORM')}
             onOpenSignIn={() => setViewState('USER_FORM')}
             onOpenRegister={() => setViewState('USER_FORM')}
@@ -109,6 +113,8 @@ export default function App() {
         {viewState === 'WELCOME' && effectiveUser && (
           <WelcomeScreen
             user={effectiveUser}
+            selectedDay={selectedDay}
+            onSelectDay={setSelectedDay}
             onSelectLevel={handleSelectLevel}
             onChangeUser={handleChangeUser}
             onViewCertificate={handleGenerateCertificate}
@@ -119,6 +125,9 @@ export default function App() {
           <QuizView
             level={activeLevel}
             questions={activeQuestions}
+            quizDay={activeDayData.quizDay}
+            topicTelugu={activeDayData.topicTelugu}
+            topicEnglish={activeDayData.topicEnglish}
             onSubmitQuiz={handleQuizSubmitted}
             onExitQuiz={() => setViewState('WELCOME')}
           />
@@ -130,6 +139,9 @@ export default function App() {
             level={activeLevel}
             questions={activeQuestions}
             selectedAnswers={selectedAnswers}
+            quizDay={activeDayData.quizDay}
+            topicTelugu={activeDayData.topicTelugu}
+            topicEnglish={activeDayData.topicEnglish}
             onGenerateCertificate={handleGenerateCertificate}
             onSelectAnotherLevel={() => setViewState('WELCOME')}
             onRetakeLevel={() => handleSelectLevel(activeLevel)}
@@ -149,10 +161,10 @@ export default function App() {
       <footer className="bg-slate-950 border-t border-slate-900 py-6 px-4 text-center text-xs text-slate-400 mt-12">
         <div className="max-w-6xl mx-auto space-y-2">
           <p className="font-semibold text-slate-300">
-            NTR Digi Class — Day 06 Live Quiz Platform
+            NTR Digi Class — {activeDayData.quizDay} Live Quiz Platform
           </p>
           <p className="text-slate-400">
-            History Teaching Methods | చరిత్ర బోధనా పద్ధతులు — AP & TS TET / DSC Social Methodology
+            {activeDayData.topicEnglish} | {activeDayData.topicTelugu} — {activeDayData.subtitle}
           </p>
           <p className="text-slate-400 text-[11px] pt-1">
             © {new Date().getFullYear()} NTR Digi Class. All rights reserved. Designed for TET & DSC aspirants.

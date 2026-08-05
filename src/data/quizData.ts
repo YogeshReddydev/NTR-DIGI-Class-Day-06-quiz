@@ -1,11 +1,19 @@
 import { Question } from '../types';
 
-export const QUIZ_DAY = 'DAY 06';
-export const QUIZ_TOPIC_TELUGU = 'చరిత్ర బోధనా పద్ధతులు';
-export const QUIZ_TOPIC_ENGLISH = 'History Teaching Methods';
-export const QUIZ_SUBTITLE = 'AP & TS TET / DSC – Social Methodology';
+export const QUIZ_DAY = 'DAY 07';
+export const QUIZ_TOPIC_TELUGU = 'న్యాయ-ధర్మ విచారణ, సహకార అభ్యసనం & సిమ్యులేషన్ బోధన';
+export const QUIZ_TOPIC_ENGLISH = 'Jurisprudential Inquiry, Cooperative Learning & Simulation';
+export const QUIZ_SUBTITLE = 'AP & TS TET / DSC – Social Methodology Revision';
 export const INSTITUTE_NAME = 'NTR Digi Class';
 export const YOUTUBE_URL = 'https://www.youtube.com/@NtrDigiclass';
+
+export interface QuizDayInfo {
+  quizDay: string;
+  topicTelugu: string;
+  topicEnglish: string;
+  subtitle: string;
+  questions: Question[];
+}
 
 export const LEVEL_INFO = {
   1: {
@@ -17,7 +25,7 @@ export const LEVEL_INFO = {
     cardGradient: 'from-emerald-500/10 via-teal-500/5 to-transparent',
     borderColor: 'hover:border-emerald-500',
     btnColor: 'bg-emerald-600 hover:bg-emerald-700 text-white',
-    description: '10 Questions covering fundamental definitions, creators, and primary terminology of History Teaching Methods.'
+    description: '10 Questions covering fundamental definitions, creators, and primary terminology.'
   },
   2: {
     levelNumber: 2,
@@ -43,7 +51,427 @@ export const LEVEL_INFO = {
   }
 };
 
-export const QUIZ_QUESTIONS: Question[] = [
+// ==================== DAY 07 QUESTIONS ====================
+export const DAY_07_QUESTIONS: Question[] = [
+  // ==================== LEVEL 1 (Easy) ====================
+  {
+    id: 1,
+    level: 1,
+    questionTelugu: 'న్యాయ-ధర్మ విచారణ పద్ధతిని (Jurisprudential Inquiry Model) అభివృద్ధి చేసినవారు ఎవరు?',
+    options: [
+      { key: 'A', text: 'బ్రూనర్, పియాజే' },
+      { key: 'B', text: 'డొనాకో డివర్, జేమ్స్ షేవర్లు' },
+      { key: 'C', text: 'జాన్ డ్యూయీ, కిల్పాట్రిక్' },
+      { key: 'D', text: 'హెర్బర్ట్, రూసో' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'న్యాయ-ధర్మ విచారణ పద్ధతిని డొనాకో డివర్ (Donald Oliver) మరియు జేమ్స్ షేవర్ (James Shaver) లు అభివృద్ధి చేశారు.'
+  },
+  {
+    id: 2,
+    level: 1,
+    questionTelugu: 'న్యాయ-ధర్మ విచారణ పద్ధతి ఎన్ని దశలలో అమలు చేస్తారు?',
+    options: [
+      { key: 'A', text: '4' },
+      { key: 'B', text: '5' },
+      { key: 'C', text: '6' },
+      { key: 'D', text: '7' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'న్యాయ-ధర్మ విచారణ పద్ధతిని మొత్తం 6 దశలలో అమలు చేస్తారు.'
+  },
+  {
+    id: 3,
+    level: 1,
+    questionTelugu: 'న్యాయ-ధర్మ విచారణలో మొదటి దశలో ఉపాధ్యాయుడు ప్రధానంగా ఏమి చేస్తాడు?',
+    options: [
+      { key: 'A', text: 'మూల్యాంకనం చేస్తాడు' },
+      { key: 'B', text: 'సమస్యలపై అవగాహన కల్పిస్తాడు' },
+      { key: 'C', text: 'పరీక్ష నిర్వహిస్తాడు' },
+      { key: 'D', text: 'బహుమతులు ఇస్తాడు' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'న్యాయ-ధర్మ విచారణ మొదటి దశలో ఉపాధ్యాయుడు విద్యార్థులకు సమస్యలపై స్పష్టమైన అవగాహన కల్పిస్తాడు.'
+  },
+  {
+    id: 4,
+    level: 1,
+    questionTelugu: 'సహకార అభ్యసనాన్ని (Cooperative Learning) 1986లో నిర్వచించినవారు ఎవరు?',
+    options: [
+      { key: 'A', text: 'జాన్ డ్యూయీ' },
+      { key: 'B', text: 'బ్రూనర్' },
+      { key: 'C', text: 'Johnson, Johnson & Holee Bee' },
+      { key: 'D', text: 'బ్లూమ్' }
+    ],
+    correctAnswer: 'C',
+    explanation: '1986లో డెవిడ్ జాన్సన్, రోజర్ జాన్సన్ మరియు ఎడ్వర్త్ హోలీ బీ (Johnson, Johnson & Holee Bee) లు సహకార అభ్యసనాన్ని నిర్వచించారు.'
+  },
+  {
+    id: 5,
+    level: 1,
+    questionTelugu: 'సహకార అభ్యసనంలో ఒక జట్టులో సాధారణంగా ఎంతమంది విద్యార్థులు ఉంటారు?',
+    options: [
+      { key: 'A', text: '2–3' },
+      { key: 'B', text: '3–6' },
+      { key: 'C', text: '8–10' },
+      { key: 'D', text: '10–12' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'సహకార అభ్యసనంలో ఒక జట్టులో సాధారణంగా 3 నుండి 6 మంది విద్యార్థులు ఉంటారు.'
+  },
+  {
+    id: 6,
+    level: 1,
+    questionTelugu: 'సహకార అభ్యసనంలో ప్రధాన లక్ష్యం ఏమిటి?',
+    options: [
+      { key: 'A', text: 'వ్యక్తిగత పోటీ' },
+      { key: 'B', text: 'ఉమ్మడి లక్ష్య సాధన' },
+      { key: 'C', text: 'పరీక్ష రాయడం' },
+      { key: 'D', text: 'జ్ఞాపకశక్తిని పెంచడం' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'సహకార అభ్యసనంలో అందరూ కలిసి పనిచేసి ఉమ్మడి లక్ష్యాన్ని సాధించడం ప్రధాన ధ్యేయం.'
+  },
+  {
+    id: 7,
+    level: 1,
+    questionTelugu: 'సిమ్యులేషన్ బోధన (Simulation Teaching) అంటే ఏమిటి?',
+    options: [
+      { key: 'A', text: 'ప్రత్యక్ష బోధన' },
+      { key: 'B', text: 'కల్పిత పరిస్థితుల్లో బోధన' },
+      { key: 'C', text: 'కేవలం ఉపన్యాసం' },
+      { key: 'D', text: 'గృహపాఠం ఇవ్వడం' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'వాస్తవ పరిస్థితిని పోలిన కల్పిత లేదా నమూనా వాతావరణంలో నిర్వహించే బోధనను సిమ్యులేషన్ బోధన అంటారు.'
+  },
+  {
+    id: 8,
+    level: 1,
+    questionTelugu: 'సిమ్యులేషన్ విధానాన్ని ఎక్కువగా ఎక్కడ ఉపయోగిస్తారు?',
+    options: [
+      { key: 'A', text: 'సంగీతం' },
+      { key: 'B', text: 'సైనిక శిక్షణ' },
+      { key: 'C', text: 'వ్యవసాయం' },
+      { key: 'D', text: 'చిత్రలేఖనం' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'సిమ్యులేషన్ విధానాన్ని సైనిక శిక్షణ, పైలట్ శిక్షణ మరియు వైద్య రంగాల్లో విస్తృతంగా ఉపయోగిస్తారు.'
+  },
+  {
+    id: 9,
+    level: 1,
+    questionTelugu: 'సిమ్యులేషన్ బోధనలో మొదటి సోపానం ఏమిటి?',
+    options: [
+      { key: 'A', text: 'మూల్యాంకనం' },
+      { key: 'B', text: 'పాత్రల కేటాయింపు' },
+      { key: 'C', text: 'పరీక్ష నిర్వహణ' },
+      { key: 'D', text: 'నివేదిక తయారీ' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'సిమ్యులేషన్ బోధనలో మొదటి సోపానం పాత్రల కేటాయింపు చేయడం.'
+  },
+  {
+    id: 10,
+    level: 1,
+    questionTelugu: 'సిమ్యులేషన్ చివరి సోపానంలో ఏమి చేస్తారు?',
+    options: [
+      { key: 'A', text: 'నటన అంశాల ఎంపిక, మార్పులు' },
+      { key: 'B', text: 'మూల్యాంకన పరీక్ష' },
+      { key: 'C', text: 'గృహపాఠం' },
+      { key: 'D', text: 'ర్యాంకులు' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'సిమ్యులేషన్ చివరి సోపానంలో నటన అంశాల ఎంపిక, అనుభవాల ఆధారంగా మార్పులు మరియు పునఃసమీక్ష నిర్వహిస్తారు.'
+  },
+
+  // ==================== LEVEL 2 (Application & Analysis) ====================
+  {
+    id: 11,
+    level: 2,
+    questionTelugu: 'న్యాయ-ధర్మ విచారణలో సమస్యలకు సంబంధించిన ముఖ్యాంశాలను గుర్తించి వర్గీకరించే దశ ఏది?',
+    options: [
+      { key: 'A', text: 'మొదటి దశ' },
+      { key: 'B', text: 'రెండవ దశ' },
+      { key: 'C', text: 'నాల్గవ దశ' },
+      { key: 'D', text: 'ఆరవ దశ' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'న్యాయ-ధర్మ విచారణలో రెండవ దశలో సమస్యకు సంబంధించిన ముఖ్యాంశాలను గుర్తించి విశ్లేషించి వర్గీకరిస్తారు.'
+  },
+  {
+    id: 12,
+    level: 2,
+    questionTelugu: 'సహకార అభ్యసనంలో ప్రతి సభ్యుడు చర్చలో పాల్గొనడం వల్ల ఏమి పెరుగుతుంది?',
+    options: [
+      { key: 'A', text: 'వ్యక్తిగత పోటీ' },
+      { key: 'B', text: 'సహకారం మరియు విమర్శనాత్మక ఆలోచన' },
+      { key: 'C', text: 'భయం' },
+      { key: 'D', text: 'ఒత్తిడి' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'ప్రతి సభ్యుడి చురుకైన భాగస్వామ్యం వల్ల పరస్పర సహకారం మరియు విమర్శనాత్మక ఆలోచన (Critical Thinking) పెరుగుతాయి.'
+  },
+  {
+    id: 13,
+    level: 2,
+    questionTelugu: 'పైలట్ శిక్షణ మరియు విమాన నడక నేర్పడంలో ఉపయోగించే బోధనా విధానం ఏది?',
+    options: [
+      { key: 'A', text: 'ఉపన్యాసం' },
+      { key: 'B', text: 'సిమ్యులేషన్' },
+      { key: 'C', text: 'కథనం' },
+      { key: 'D', text: 'ప్రాజెక్ట్' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'ప్రమాదరహితంగా కల్పిత కాక్‌పిట్ వాతావరణాన్ని సృష్టించి పైలట్ శిక్షణ ఇవ్వడానికి సిమ్యులేషన్ విధానాన్ని ఉపయోగిస్తారు.'
+  },
+  {
+    id: 14,
+    level: 2,
+    questionTelugu: 'న్యాయ-ధర్మ విచారణలో విలువల సంఘర్షణను (Conflict of Values) నిర్ణయించే దశ ఏది?',
+    options: [
+      { key: 'A', text: 'మొదటి దశ' },
+      { key: 'B', text: 'రెండవ దశ' },
+      { key: 'C', text: 'నాల్గవ దశ' },
+      { key: 'D', text: 'ఆరవ దశ' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'నాల్గవ దశలో విలువల సంఘర్షణను స్పష్టంగా గుర్తించి నిర్ణయిస్తారు.'
+  },
+  {
+    id: 15,
+    level: 2,
+    questionTelugu: 'సహకార అభ్యసనంలో జ్ఞానం ఎలా నిర్మించబడుతుంది?',
+    options: [
+      { key: 'A', text: 'ఉపాధ్యాయుడు మాత్రమే అందిస్తాడు' },
+      { key: 'B', text: 'విద్యార్థులు స్వయంగా పరస్పర చర్చల ద్వారా' },
+      { key: 'C', text: 'పుస్తకాల ద్వారా మాత్రమే' },
+      { key: 'D', text: 'పరీక్షల ద్వారా' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'సహకార అభ్యసనంలో విద్యార్థులు సమూహ చర్చలు, పరస్పర భాగస్వామ్యం ద్వారా స్వయంగా జ్ఞానాన్ని నిర్మించుకుంటారు.'
+  },
+  {
+    id: 16,
+    level: 2,
+    questionTelugu: 'సిమ్యులేషన్లో బోధనా అంశ ఎంపిక జరిగేది ఏ సోపానంలో?',
+    options: [
+      { key: 'A', text: 'మొదటి సోపానం' },
+      { key: 'B', text: 'రెండవ సోపానం' },
+      { key: 'C', text: 'మూడవ సోపానం' },
+      { key: 'D', text: 'నాల్గవ సోపానం' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'సిమ్యులేషన్ రెండవ సోపానంలో నిర్వహించాల్సిన అంశం లేదా సన్నివేశం యొక్క ఎంపిక జరుగుతుంది.'
+  },
+  {
+    id: 17,
+    level: 2,
+    questionTelugu: 'సహకార అభ్యసనంలో సభ్యులందరూ అంశాన్ని అర్థం చేసుకున్న తరువాతే ఏమి పూర్తవుతుంది?',
+    options: [
+      { key: 'A', text: 'పరీక్ష' },
+      { key: 'B', text: 'అభ్యసనం' },
+      { key: 'C', text: 'హాజరు' },
+      { key: 'D', text: 'గృహపాఠం' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'సహకార అభ్యసన సూత్రం ప్రకారం జట్టులోని ప్రతి సభ్యుడూ విషయాన్ని సమగ్రంగా గ్రహించినప్పుడే అభ్యసన ప్రక్రియ పూర్తవుతుంది.'
+  },
+  {
+    id: 18,
+    level: 2,
+    questionTelugu: 'న్యాయ-ధర్మ విచారణలో తీసుకున్న నిర్ణయాలకు కారణాలను వివరించే దశ ఏది?',
+    options: [
+      { key: 'A', text: 'ఐదవ దశ' },
+      { key: 'B', text: 'మూడవ దశ' },
+      { key: 'C', text: 'మొదటి దశ' },
+      { key: 'D', text: 'రెండవ దశ' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'న్యాయ-ధర్మ విచారణ ఐదవ దశలో విద్యార్థులు తమ నిర్ణయాలు లేదా ముగింపులకు గల శాస్త్రీయ/న్యాయపరమైన కారణాలను సమర్థవంతంగా వివరిస్తారు.'
+  },
+  {
+    id: 19,
+    level: 2,
+    questionTelugu: 'సిమ్యులేషన్లో సంభాషణ ప్రారంభించే వ్యక్తులను నిర్ణయించేది ఎవరు?',
+    options: [
+      { key: 'A', text: 'విద్యార్థులు మాత్రమే' },
+      { key: 'B', text: 'ఉపాధ్యాయుడు' },
+      { key: 'C', text: 'ప్రధానోపాధ్యాయుడు' },
+      { key: 'D', text: 'తల్లిదండ్రులు' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'సిమ్యులేషన్ నిర్వహణలో ఉపాధ్యాయుడు సన్నివేశ నిర్దేశకునిగా ఉండి పాత్రలను, సంభాషణ ప్రారంభకులను నిర్ణయిస్తాడు.'
+  },
+  {
+    id: 20,
+    level: 2,
+    questionTelugu: 'సహకార అభ్యసనంలో తెలియని అంశాలను తెలుసుకోవడానికి విద్యార్థులు ఎవరిని సంప్రదిస్తారు?',
+    options: [
+      { key: 'A', text: 'స్నేహితులు' },
+      { key: 'B', text: 'ఉపాధ్యాయుడు' },
+      { key: 'C', text: 'తల్లిదండ్రులు' },
+      { key: 'D', text: 'గ్రంథాలయం' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'సమూహ చర్చల అనంతరం పరిష్కారం కానటువంటి సందేహాలను నివృత్తి చేసుకోవడానికి విద్యార్థులు ఉపాధ్యాయుడిని సంప్రదిస్తారు.'
+  },
+
+  // ==================== LEVEL 3 (Assertion & Reason) ====================
+  {
+    id: 21,
+    level: 3,
+    questionTelugu: 'న్యాయ-ధర్మ విచారణలో విలువల విశ్లేషణ ప్రాముఖ్యత:',
+    assertion: 'న్యాయ-ధర్మ విచారణలో సమస్యల పరిష్కారానికి విలువల విశ్లేషణ అవసరం.',
+    reason: 'సమాజంలోని భిన్నమైన ఆలోచనలు మరియు సంఘర్షణలను అర్థం చేసుకోవడానికి ఇది ఉపయోగపడుతుంది.',
+    options: [
+      { key: 'A', text: 'A మరియు R రెండూ సరైనవి; R, Aకు సరైన వివరణ' },
+      { key: 'B', text: 'A మరియు R రెండూ సరైనవి; కానీ R, Aకు సరైన వివరణ కాదు' },
+      { key: 'C', text: 'A సరైనది; R తప్పు' },
+      { key: 'D', text: 'A తప్పు; R సరైనది' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'న్యాయ-ధర్మ విచారణలో సామాజిక విలువల విశ్లేషణ ద్వారా సమాజంలోని వైవిధ్యమైన ఆలోచనలు, సంక్షోభాలను సులభంగా అర్థం చేసుకోవచ్చు.'
+  },
+  {
+    id: 22,
+    level: 3,
+    questionTelugu: 'సహకార అభ్యసనంలో సభ్యుల భాగస్వామ్యం:',
+    assertion: 'సహకార అభ్యసనంలో సభ్యులందరూ చురుకుగా పాల్గొంటారు.',
+    reason: 'ఉమ్మడి లక్ష్యాన్ని చేరుకోవడం ప్రధాన ఉద్దేశ్యం.',
+    options: [
+      { key: 'A', text: 'A మరియు R రెండూ సరైనవి; R, Aకు సరైన వివరణ' },
+      { key: 'B', text: 'A మరియు R రెండూ సరైనవి; కానీ R, Aకు సరైన వివరణ కాదు' },
+      { key: 'C', text: 'A సరైనది; R తప్పు' },
+      { key: 'D', text: 'A తప్పు; R సరైనది' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'ఉమ్మడి లక్ష్యాన్ని సాధించడానికి ప్రతి సభ్యుడూ చురుకైన బాధ్యత తీసుకుని సహకరిస్తాడు. కావున R, Aకు సరైన వివరణ.'
+  },
+  {
+    id: 23,
+    level: 3,
+    questionTelugu: 'సిమ్యులేషన్ బోధన కల్పిత పరిస్థితులు:',
+    assertion: 'సిమ్యులేషన్ బోధన కల్పిత పరిస్థితుల్లో నిర్వహించబడుతుంది.',
+    reason: 'ఇది వాస్తవ పరిస్థితులను అభ్యసించడానికి సహాయపడుతుంది.',
+    options: [
+      { key: 'A', text: 'A మరియు R రెండూ సరైనవి; R, Aకు సరైన వివరణ' },
+      { key: 'B', text: 'A మరియు R రెండూ సరైనవి; కానీ R, Aకు సరైన వివరణ కాదు' },
+      { key: 'C', text: 'A సరైనది; R తప్పు' },
+      { key: 'D', text: 'A తప్పు; R సరైనది' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'వాస్తవ పరిస్థితులలో ఉండే క్లిష్టతలను సురక్షితమైన నమూనా/కల్పిత వాతావరణంలో అభ్యసించడం సిమ్యులేషన్ యొక్క ప్రయోజనం.'
+  },
+  {
+    id: 24,
+    level: 3,
+    questionTelugu: 'సహకార అభ్యసన లక్ష్యాల గురించిన విశ్లేషణ:',
+    assertion: 'సహకార అభ్యసనంలో వ్యక్తిగత పోటీ ప్రధాన లక్ష్యం.',
+    reason: 'ప్రతి విద్యార్థి ఒంటరిగా పనిచేయాలి.',
+    options: [
+      { key: 'A', text: 'A మరియు R రెండూ సరైనవి; R, Aకు సరైన వివరణ' },
+      { key: 'B', text: 'A మరియు R రెండూ సరైనవి; కానీ R, Aకు సరైన వివరణ కాదు' },
+      { key: 'C', text: 'A సరైనది; R తప్పు' },
+      { key: 'D', text: 'A తప్పు; R సరైనది' }
+    ],
+    correctAnswer: 'D',
+    explanation: 'సహకార అభ్యసనంలో వ్యక్తిగత పోటీ కాకుండా సమిష్టి సహకారం లక్ష్యం, మరియు విద్యార్థులు జట్లుగా పనిచేస్తారు ఒంటరిగా కాదు.'
+  },
+  {
+    id: 25,
+    level: 3,
+    questionTelugu: 'న్యాయ-ధర్మ విచారణలోని దశల విశ్లేషణ:',
+    assertion: 'న్యాయ-ధర్మ విచారణలో మొత్తం ఆరు దశలు ఉంటాయి.',
+    reason: 'ప్రతి దశ సమస్య పరిష్కారంలో ప్రత్యేక పాత్రను పోషిస్తుంది.',
+    options: [
+      { key: 'A', text: 'A మరియు R రెండూ సరైనవి; R, Aకు సరైన వివరణ' },
+      { key: 'B', text: 'A మరియు R రెండూ సరైనవి; కానీ R, Aకు సరైన వివరణ కాదు' },
+      { key: 'C', text: 'A సరైనది; R తప్పు' },
+      { key: 'D', text: 'A తప్పు; R సరైనది' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'న్యాయ-ధర్మ విచారణలోని 6 దశలూ అనుక్రమంగా సమస్య అవగాహన నుండి ముగింపు నిర్ణయాలు రాబట్టే వరకు కీలక పాత్ర వహిస్తాయి.'
+  },
+  {
+    id: 26,
+    level: 3,
+    questionTelugu: 'సిమ్యులేషన్లో పాత్రల కేటాయింపు సోపానం:',
+    assertion: 'సిమ్యులేషన్లో పాత్రల కేటాయింపు మొదటి సోపానంలో జరుగుతుంది.',
+    reason: 'ప్రతి వ్యక్తి పాత్రను అనుభవించడం శిక్షణలో భాగం.',
+    options: [
+      { key: 'A', text: 'A మరియు R రెండూ సరైనవి; R, Aకు సరైన వివరణ' },
+      { key: 'B', text: 'A మరియు R రెండూ సరైనవి; కానీ R, Aకు సరైన వివరణ కాదు' },
+      { key: 'C', text: 'A సరైనది; R తప్పు' },
+      { key: 'D', text: 'A తప్పు; R సరైనది' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'మొదటి సోపానంలో పాత్రల కేటాయింపు జరగడం వలన పాల్గొనే ప్రతి వ్యక్తి ఆ పాత్రలోని బాధ్యతను అనుభవించగలడు.'
+  },
+  {
+    id: 27,
+    level: 3,
+    questionTelugu: 'సహకార అభ్యసనం మరియు విమర్శనాత్మక ఆలోచన:',
+    assertion: 'సహకార అభ్యసనంలో విమర్శనాత్మక ఆలోచన పెరుగుతుంది.',
+    reason: 'విద్యార్థులు పరస్పరం చర్చించి అభిప్రాయాలను పంచుకుంటారు.',
+    options: [
+      { key: 'A', text: 'A మరియు R రెండూ సరైనవి; R, Aకు సరైన వివరణ' },
+      { key: 'B', text: 'A మరియు R రెండూ సరైనవి; కానీ R, Aకు సరైన వివరణ కాదు' },
+      { key: 'C', text: 'A సరైనది; R తప్పు' },
+      { key: 'D', text: 'A తప్పు; R సరైనది' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'పరస్పర అభిప్రాయ మార్పిడి మరియు సమ్మతి చర్చల ద్వారా విమర్శనాత్మకంగా ఆలోచించే సామర్థ్యం పెరుగుతుంది.'
+  },
+  {
+    id: 28,
+    level: 3,
+    questionTelugu: 'న్యాయ-ధర్మ విచారణలో ఐదవ దశ వివరణ:',
+    assertion: 'న్యాయ-ధర్మ విచారణలో ఐదవ దశలో నిర్ణయాలకు కారణాలు వివరిస్తారు.',
+    reason: 'విద్యార్థులు తమ నిర్ణయాన్ని తార్కికంగా సమర్థించాలి.',
+    options: [
+      { key: 'A', text: 'A మరియు R రెండూ సరైనవి; R, Aకు సరైన వివరణ' },
+      { key: 'B', text: 'A మరియు R రెండూ సరైనవి; కానీ R, Aకు సరైన వివరణ కాదు' },
+      { key: 'C', text: 'A సరైనది; R తప్పు' },
+      { key: 'D', text: 'A తప్పు; R సరైనది' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'ఐదవ దశలో విద్యార్థులు స్వీకరించిన నిర్ణయాలను తార్కికంగా మరియు న్యాయసూత్రాల వెలుగులో సమర్థించాలి.'
+  },
+  {
+    id: 29,
+    level: 3,
+    questionTelugu: 'సిమ్యులేషన్లో మూల్యాంకనం మరియు పరిశీలన:',
+    assertion: 'సిమ్యులేషన్లో మూల్యాంకనం నాల్గవ సోపానంలో జరుగుతుంది.',
+    reason: 'పరిశీలకుల అభిప్రాయాలు మరియు ప్రతిస్పందనలు నమోదు చేయబడతాయి.',
+    options: [
+      { key: 'A', text: 'A మరియు R రెండూ సరైనవి; R, Aకు సరైన వివరణ' },
+      { key: 'B', text: 'A మరియు R రెండూ సరైనవి; కానీ R, Aకు సరైన వివరణ కాదు' },
+      { key: 'C', text: 'A సరైనది; R తప్పు' },
+      { key: 'D', text: 'A తప్పు; R సరైనది' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'నాల్గవ సోపానంలో పరిశీలన మరియు మూల్యాంకన ప్రక్రియ పూర్తి చేసి అభిప్రాయాలను సేకరిస్తారు.'
+  },
+  {
+    id: 30,
+    level: 3,
+    questionTelugu: 'సహకార అభ్యసనం పూర్తి కావడం:',
+    assertion: 'సహకార అభ్యసనంలో సభ్యులందరూ అంశాన్ని అర్థం చేసుకున్న తరువాతే అభ్యసనం పూర్తవుతుంది.',
+    reason: 'సహకార అభ్యసనం సమిష్టి అభ్యసనంపై ఆధారపడి ఉంటుంది.',
+    options: [
+      { key: 'A', text: 'A మరియు R రెండూ సరైనవి; R, Aకు సరైన వివరణ' },
+      { key: 'B', text: 'A మరియు R రెండూ సరైనవి; కానీ R, Aకు సరైన వివరణ కాదు' },
+      { key: 'C', text: 'A సరైనది; R తప్పు' },
+      { key: 'D', text: 'A తప్పు; R సరైనది' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'సమిష్టి పురోగతే సహకార అభ్యసనానికి మూలస్తంభం. కావున అందరూ గ్రహించినప్పుడే అభ్యసనం పూర్తవుతుంది.'
+  }
+];
+
+// ==================== DAY 06 QUESTIONS ====================
+export const DAY_06_QUESTIONS: Question[] = [
   // ==================== LEVEL 1 (Easy) ====================
   {
     id: 1,
@@ -496,3 +924,22 @@ export const QUIZ_QUESTIONS: Question[] = [
     explanation: 'పరిణామ పద్ధతి సమాజాలలో క్రమంగా వచ్చిన సాంస్కృతిక, సాంకేతిక మార్పుల వికాస క్రమాన్ని అనుసంధానిస్తూ అర్థమయ్యేలా చేస్తుంది.'
   }
 ];
+
+export const QUIZ_QUESTIONS: Question[] = DAY_07_QUESTIONS;
+
+export const ALL_QUIZ_DAYS: Record<string, QuizDayInfo> = {
+  'DAY 07': {
+    quizDay: 'DAY 07',
+    topicTelugu: 'న్యాయ-ధర్మ విచారణ, సహకార అభ్యసనం & సిమ్యులేషన్ బోధన',
+    topicEnglish: 'Jurisprudential Inquiry, Cooperative Learning & Simulation',
+    subtitle: 'AP & TS TET / DSC – Social Methodology Revision',
+    questions: DAY_07_QUESTIONS
+  },
+  'DAY 06': {
+    quizDay: 'DAY 06',
+    topicTelugu: 'చరిత్ర బోధనా పద్ధతులు',
+    topicEnglish: 'History Teaching Methods',
+    subtitle: 'AP & TS TET / DSC – Social Methodology',
+    questions: DAY_06_QUESTIONS
+  }
+};
