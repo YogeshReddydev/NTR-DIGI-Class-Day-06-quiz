@@ -39,8 +39,12 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
 
   const { fetchUserAttempts } = useAuth();
   const { saveQuizAttempt } = useNetwork();
+  const hasSavedAttempt = React.useRef(false);
 
   useEffect(() => {
+    if (hasSavedAttempt.current) return;
+    hasSavedAttempt.current = true;
+
     // Calculate score
     let correctCount = 0;
     questions.forEach((q) => {

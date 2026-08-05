@@ -124,7 +124,12 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {([1, 2, 3] as const).map((lvl) => {
           const info = LEVEL_INFO[lvl];
-          const bestAttempt = userAttempts.find((a) => a.level === lvl && a.certificateEligible);
+          const bestAttempt = userAttempts.find(
+            (a) =>
+              (a.quizDay === activeDayData.quizDay || (!a.quizDay && activeDayData.quizDay === 'DAY 07')) &&
+              a.level === lvl &&
+              a.certificateEligible
+          );
           return (
             <div
               key={lvl}
@@ -210,56 +215,73 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       </div>
 
       {/* User Firestore Attempt History Card */}
-      {userAttempts.length > 0 && (
-        <div className="glass-card rounded-3xl p-6 sm:p-8 space-y-4 border border-white/10 shadow-xl">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-3">
-              <Award className="w-6 h-6 text-amber-400" />
-              <div>
-                <h4 className="text-lg font-black text-white">Your Certificate & Attempt History</h4>
-                <p className="text-xs text-slate-300">Saved securely under your candidate account</p>
+      {userAttempts.length > 0 && (() => {
+        // Deduplicate attempts array to prevent redundant cards
+        const seenKeys = new Set<string>();
+        const uniqueAttempts = userAttempts.filter((att) => {
+          const day = att.quizDay || 'DAY 07';
+          const key = `${day}-L${att.level}-${att.score}-${att.completionDate}-${att.completionTime || ''}`;
+          if (seenKeys.has(key)) return false;
+          seenKeys.add(key);
+          return true;
+        });
+
+        return (
+          <div className="glass-card rounded-3xl p-6 sm:p-8 space-y-4 border border-white/10 shadow-xl">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-3">
+                <Award className="w-6 h-6 text-amber-400" />
+                <div>
+                  <h4 className="text-lg font-black text-white">Your Certificate & Attempt History</h4>
+                  <p className="text-xs text-slate-300">Saved securely under your candidate account</p>
+                </div>
               </div>
+              <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold px-3 py-1 rounded-full">
+                {uniqueAttempts.length} Unique Attempts
+              </span>
             </div>
-            <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold px-3 py-1 rounded-full">
-              {userAttempts.length} Attempts Total
-            </span>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
-            {userAttempts.map((att, i) => (
-              <div
-                key={att.id || i}
-                className="bg-slate-950/80 border border-white/10 rounded-2xl p-4 space-y-3 backdrop-blur-md"
-              >
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-amber-400">Level {att.level} Quiz</span>
-                  <span className={`font-black px-2 py-0.5 rounded-full text-[10px] ${att.certificateEligible ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'}`}>
-                    {att.certificateEligible ? 'PASSED (8+)' : 'ATTEMPTED'}
-                  </span>
-                </div>
-
-                <div className="flex items-baseline justify-between">
-                  <span className="text-2xl font-black text-white">{att.score} <span className="text-xs font-semibold text-slate-400">/ 10 ({att.percentage}%)</span></span>
-                  <div className="text-[11px] text-slate-400 flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-sky-400" />
-                    <span>{att.completionDate}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+              {uniqueAttempts.map((att, i) => (
+                <div
+                  key={att.id || att.certificateId || i}
+                  className="bg-slate-950/80 border border-white/10 rounded-2xl p-4 space-y-3 backdrop-blur-md"
+                >
+                  <div className="flex items-center justify-between text-xs gap-1 flex-wrap">
+                    <div className="flex items-center gap-1.5">
+                      <span className="bg-sky-500/20 text-sky-300 font-extrabold px-2 py-0.5 rounded-md text-[10px] uppercase border border-sky-500/30">
+                        {att.quizDay || 'DAY 07'}
+                      </span>
+                      <span className="font-bold text-amber-400">Level {att.level}</span>
+                    </div>
+                    <span className={`font-black px-2 py-0.5 rounded-full text-[10px] ${att.certificateEligible ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'}`}>
+                      {att.certificateEligible ? 'PASSED (8+)' : 'ATTEMPTED'}
+                    </span>
                   </div>
-                </div>
 
-                {att.certificateEligible && onViewCertificate && (
-                  <button
-                    onClick={() => onViewCertificate(att)}
-                    className="w-full mt-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>View / Download Certificate</span>
-                  </button>
-                )}
-              </div>
-            ))}
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-2xl font-black text-white">{att.score} <span className="text-xs font-semibold text-slate-400">/ 10 ({att.percentage}%)</span></span>
+                    <div className="text-[11px] text-slate-400 flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-sky-400" />
+                      <span>{att.completionDate}</span>
+                    </div>
+                  </div>
+
+                  {att.certificateEligible && onViewCertificate && (
+                    <button
+                      onClick={() => onViewCertificate(att)}
+                      className="w-full mt-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>View / Download Certificate</span>
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* YouTube Promotion Banner */}
       <YouTubeBanner />

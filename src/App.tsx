@@ -84,6 +84,11 @@ export default function App() {
       {/* Permanent Header with Firebase Auth */}
       <Header
         userName={effectiveUser?.fullName}
+        selectedDay={selectedDay}
+        quizDay={activeDayData.quizDay}
+        topicTelugu={activeDayData.topicTelugu}
+        topicEnglish={activeDayData.topicEnglish}
+        subtitle={activeDayData.subtitle}
         onChangeUser={effectiveUser ? handleChangeUser : undefined}
         onOpenSignIn={() => setViewState('USER_FORM')}
         onNavigateHome={() => setViewState('HOME')}

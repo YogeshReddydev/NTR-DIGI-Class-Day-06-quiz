@@ -18,12 +18,32 @@ interface HeaderProps {
   onChangeUser?: () => void;
   onOpenSignIn?: () => void;
   onNavigateHome?: () => void;
+  selectedDay?: string;
+  quizDay?: string;
+  topicTelugu?: string;
+  topicEnglish?: string;
+  subtitle?: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSignIn, onNavigateHome }) => {
+export const Header: React.FC<HeaderProps> = ({
+  userName,
+  onChangeUser,
+  onOpenSignIn,
+  onNavigateHome,
+  selectedDay,
+  quizDay,
+  topicTelugu,
+  topicEnglish,
+  subtitle
+}) => {
   const { user, userProfile, signOutUser } = useAuth();
   const { isOnline, pendingBufferCount, isSyncing, syncNow } = useNetwork();
   const [muted, setMuted] = useState<boolean>(() => isSoundMuted());
+
+  const activeDayLabel = quizDay || selectedDay || QUIZ_DAY;
+  const activeTopicEng = topicEnglish || QUIZ_TOPIC_ENGLISH;
+  const activeTopicTel = topicTelugu || QUIZ_TOPIC_TELUGU;
+  const activeSub = subtitle || QUIZ_SUBTITLE;
 
   const toggleSound = () => {
     const next = !muted;
@@ -60,16 +80,16 @@ export const Header: React.FC<HeaderProps> = ({ userName, onChangeUser, onOpenSi
                   {INSTITUTE_NAME}
                 </span>
                 <span className="bg-sky-500/10 text-sky-300 border border-sky-500/30 text-xs font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-md">
-                  {QUIZ_DAY} LIVE QUIZ
+                  {activeDayLabel} LIVE QUIZ
                 </span>
               </div>
 
               <h1 className="text-lg sm:text-xl md:text-2xl font-black tracking-tight text-white mt-1 group-hover:text-amber-300 transition-colors">
-                {QUIZ_TOPIC_ENGLISH} <span className="text-amber-400 font-semibold">| {QUIZ_TOPIC_TELUGU}</span>
+                {activeTopicEng} <span className="text-amber-400 font-semibold">| {activeTopicTel}</span>
               </h1>
 
               <p className="text-xs sm:text-sm text-slate-300 font-medium">
-                {QUIZ_SUBTITLE}
+                {activeSub}
               </p>
             </div>
           </button>
