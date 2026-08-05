@@ -225,11 +225,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       );
       const snapshot = await getDocs(q);
       const attempts: QuizAttempt[] = [];
+      const seenKeys = new Set<string>();
+
       snapshot.forEach((docSnap) => {
-        attempts.push({
-          id: docSnap.id,
-          ...(docSnap.data() as Omit<QuizAttempt, 'id'>)
-        });
+        const data = docSnap.data() as Omit<QuizAttempt, 'id'>;
+        const day = data.quizDay || 'DAY 07';
+        // Deduplicate by Day, Level, Score, and Completion Date so duplicate records collapse
+        const key = `${day}-L${data.level}-${data.score}-${data.completionDate}`;
+
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
+          attempts.push({
+            id: docSnap.id,
+            ...data
+          });
+        }
       });
       // Sort newest first
       attempts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

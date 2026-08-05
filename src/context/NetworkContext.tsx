@@ -22,10 +22,12 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isOnline, setIsOnline] = useState<boolean>(() => navigator.onLine);
   const [pendingBufferCount, setPendingBufferCount] = useState<number>(() => getBufferedAttempts().length);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const isSyncingRef = React.useRef<boolean>(false);
 
   // Sync buffered attempts if online
   const syncNow = useCallback(async () => {
-    if (!navigator.onLine || isSyncing) return;
+    if (!navigator.onLine || isSyncingRef.current) return;
+    isSyncingRef.current = true;
     setIsSyncing(true);
     try {
       const res = await syncBufferedAttempts();
@@ -37,9 +39,10 @@ export const NetworkProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch (err) {
       console.warn('Sync buffered attempts error:', err);
     } finally {
+      isSyncingRef.current = false;
       setIsSyncing(false);
     }
-  }, [isSyncing]);
+  }, []);
 
   // Online / Offline event listeners
   useEffect(() => {

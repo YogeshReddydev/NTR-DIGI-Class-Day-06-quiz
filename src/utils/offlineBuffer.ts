@@ -45,8 +45,16 @@ export async function syncBufferedAttempts(): Promise<{ syncedCount: number; fai
     return { syncedCount: 0, failedCount: 0 };
   }
 
+  // Clear buffer FIRST in localStorage to prevent concurrent/repeated sync loops
+  try {
+    localStorage.removeItem(BUFFER_KEY);
+  } catch (e) {
+    // ignore
+  }
+
   let syncedCount = 0;
   let failedCount = 0;
+  const failedItems: QuizAttempt[] = [];
 
   for (const attempt of buffered) {
     try {
@@ -55,11 +63,20 @@ export async function syncBufferedAttempts(): Promise<{ syncedCount: number; fai
         syncedFromBuffer: true,
         timestamp: serverTimestamp()
       });
-      removeBufferedAttempt(attempt.createdAt);
       syncedCount++;
     } catch (err) {
       console.warn('Failed to sync buffered attempt to Firestore:', err);
       failedCount++;
+      failedItems.push(attempt);
+    }
+  }
+
+  // Restore failed items to buffer if any
+  if (failedItems.length > 0) {
+    try {
+      localStorage.setItem(BUFFER_KEY, JSON.stringify(failedItems));
+    } catch (e) {
+      // ignore
     }
   }
 

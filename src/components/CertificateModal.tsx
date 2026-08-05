@@ -70,7 +70,28 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`NTR_Digi_Class_Certificate_${attempt.fullName.replace(/\s+/g, '_')}_Level${attempt.level}.pdf`);
+
+      const fileName = `NTR_Digi_Class_Certificate_${(attempt.fullName || 'Candidate').replace(/\s+/g, '_')}_Level${attempt.level}.pdf`;
+
+      // Convert jsPDF output to a Blob with explicit application/pdf type
+      const pdfOutput = pdf.output('blob');
+      const pdfBlob = new Blob([pdfOutput], { type: 'application/pdf' });
+      const blobUrl = URL.createObjectURL(pdfBlob);
+
+      // Force browser-level download trigger via anchor element
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = fileName;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+
+      setTimeout(() => {
+        if (document.body.contains(link)) {
+          document.body.removeChild(link);
+        }
+        URL.revokeObjectURL(blobUrl);
+      }, 500);
     } catch (err) {
       console.error('Certificate PDF export error:', err);
       setDownloadError('Unable to generate PDF. Please try the PNG Image button or Print option.');
@@ -86,19 +107,39 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
 
     try {
       const canvas = await generateCanvas();
-      const image = canvas.toDataURL('image/png', 1.0);
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = `NTR_Digi_Class_Certificate_${attempt.fullName.replace(/\s+/g, '_')}_Level${attempt.level}.png`;
-      document.body.appendChild(link);
-      link.click();
-      setTimeout(() => {
-        document.body.removeChild(link);
-      }, 100);
+      const fileName = `NTR_Digi_Class_Certificate_${(attempt.fullName || 'Candidate').replace(/\s+/g, '_')}_Level${attempt.level}.png`;
+
+      // Convert canvas to Blob with explicit image/png type
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          setDownloadError('Unable to generate PNG image blob. Please try PDF or Print option.');
+          setIsDownloadingImage(false);
+          return;
+        }
+
+        const pngBlob = new Blob([blob], { type: 'image/png' });
+        const blobUrl = URL.createObjectURL(pngBlob);
+
+        // Force browser-level download trigger via anchor element
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = fileName;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+
+        setTimeout(() => {
+          if (document.body.contains(link)) {
+            document.body.removeChild(link);
+          }
+          URL.revokeObjectURL(blobUrl);
+        }, 500);
+
+        setIsDownloadingImage(false);
+      }, 'image/png', 1.0);
     } catch (err) {
       console.error('Certificate canvas export error:', err);
       setDownloadError('Unable to generate PNG image. Please use the PDF button or Print option.');
-    } finally {
       setIsDownloadingImage(false);
     }
   };

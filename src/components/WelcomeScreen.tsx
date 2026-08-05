@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Award, CheckCircle2, Zap, Shield, Sparkles, BookOpen, UserCheck, Calendar, Clock, Download, Check } from 'lucide-react';
+import { Play, Award, CheckCircle2, Zap, Shield, Sparkles, BookOpen, UserCheck, Calendar, Clock, Download, Check, Flame } from 'lucide-react';
 import {
   INSTITUTE_NAME,
   QUIZ_DAY,
@@ -24,6 +24,64 @@ interface WelcomeScreenProps {
   onViewCertificate?: (attempt: QuizAttempt) => void;
 }
 
+// Calculate consecutive daily quiz streak from attempts
+const calculateDailyStreak = (attempts: QuizAttempt[]): { streak: number; isActiveToday: boolean } => {
+  if (!attempts || attempts.length === 0) return { streak: 0, isActiveToday: false };
+
+  const uniqueDates = new Set<string>();
+
+  attempts.forEach((att) => {
+    let dateObj: Date | null = null;
+    if (att.createdAt) {
+      dateObj = new Date(att.createdAt);
+    } else if (att.completionDate) {
+      dateObj = new Date(att.completionDate);
+    }
+    if (dateObj && !isNaN(dateObj.getTime())) {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      uniqueDates.add(`${year}-${month}-${day}`);
+    }
+  });
+
+  const today = new Date();
+  const formatYMD = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
+  const todayStr = formatYMD(today);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = formatYMD(yesterday);
+
+  const isActiveToday = uniqueDates.has(todayStr);
+
+  const currentCheckDate = isActiveToday ? today : (uniqueDates.has(yesterdayStr) ? yesterday : null);
+
+  if (!currentCheckDate) {
+    return { streak: 0, isActiveToday: false };
+  }
+
+  let streak = 0;
+  const runner = new Date(currentCheckDate);
+
+  while (true) {
+    const dateStr = formatYMD(runner);
+    if (uniqueDates.has(dateStr)) {
+      streak++;
+      runner.setDate(runner.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+
+  return { streak, isActiveToday };
+};
+
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   user,
   selectedDay = 'DAY 07',
@@ -34,6 +92,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 }) => {
   const { userAttempts } = useAuth();
   const activeDayData = ALL_QUIZ_DAYS[selectedDay] || ALL_QUIZ_DAYS['DAY 07'];
+  const { streak, isActiveToday } = calculateDailyStreak(userAttempts);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 sm:py-10 space-y-8">
@@ -49,9 +108,26 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               <Logo size="xl" layout="badge-only" />
             </div>
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-md">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Candidate Portal</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-md">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Candidate Portal</span>
+                </div>
+
+                {/* Daily Streak Counter Badge */}
+                <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border backdrop-blur-md transition-all ${
+                  streak > 0
+                    ? 'bg-gradient-to-r from-orange-500/20 via-amber-500/20 to-yellow-500/20 border-orange-500/40 text-orange-300 shadow-md'
+                    : 'bg-slate-900/80 border-slate-700/60 text-slate-400'
+                }`}>
+                  <Flame className={`w-4 h-4 ${streak > 0 ? 'text-orange-400 fill-orange-400/30 animate-pulse' : 'text-slate-500'}`} />
+                  <span>{streak} Day Study Streak</span>
+                  {isActiveToday ? (
+                    <span className="bg-emerald-500/20 text-emerald-300 text-[10px] px-1.5 py-0.2 rounded font-extrabold border border-emerald-500/30">Active</span>
+                  ) : streak > 0 ? (
+                    <span className="bg-amber-500/20 text-amber-300 text-[10px] px-1.5 py-0.2 rounded font-extrabold border border-amber-500/30">Take Quiz Today!</span>
+                  ) : null}
+                </div>
               </div>
               
               <h2 className="text-2xl sm:text-4xl font-black text-white">
@@ -216,11 +292,12 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
       {/* User Firestore Attempt History Card */}
       {userAttempts.length > 0 && (() => {
-        // Deduplicate attempts array to prevent redundant cards
+        // Deduplicate attempts array to collapse redundant rapid-sync cards
         const seenKeys = new Set<string>();
         const uniqueAttempts = userAttempts.filter((att) => {
           const day = att.quizDay || 'DAY 07';
-          const key = `${day}-L${att.level}-${att.score}-${att.completionDate}-${att.completionTime || ''}`;
+          const key = `${day}-L${att.level}-${att.score}-${att.completionDate}`;
+
           if (seenKeys.has(key)) return false;
           seenKeys.add(key);
           return true;
