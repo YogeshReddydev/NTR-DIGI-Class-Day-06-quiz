@@ -84,14 +84,14 @@ const calculateDailyStreak = (attempts: QuizAttempt[]): { streak: number; isActi
 
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   user,
-  selectedDay = 'DAY 07',
+  selectedDay = 'DAY 08',
   onSelectDay,
   onSelectLevel,
   onChangeUser,
   onViewCertificate
 }) => {
   const { userAttempts } = useAuth();
-  const activeDayData = ALL_QUIZ_DAYS[selectedDay] || ALL_QUIZ_DAYS['DAY 07'];
+  const activeDayData = ALL_QUIZ_DAYS[selectedDay] || ALL_QUIZ_DAYS['DAY 08'];
   const { streak, isActiveToday } = calculateDailyStreak(userAttempts);
 
   return (
@@ -135,7 +135,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               </h2>
               
               <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
-                Test your understanding of important <strong className="text-white">History Teaching Methods ({QUIZ_TOPIC_TELUGU})</strong> concepts with carefully designed AP & TS TET / DSC level questions.
+                Test your understanding of important <strong className="text-white">{activeDayData.topicEnglish} ({activeDayData.topicTelugu})</strong> concepts with carefully designed AP & TS TET / DSC level questions.
               </p>
             </div>
           </div>
@@ -178,7 +178,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                 }`}
               >
                 <span>{dayKey}</span>
-                {dayKey === 'DAY 07' && <span className="text-[10px] bg-amber-950/60 text-amber-300 px-1.5 py-0.5 rounded font-bold border border-amber-500/40">LIVE</span>}
+                {dayKey === 'DAY 08' && <span className="text-[10px] bg-amber-950/60 text-amber-300 px-1.5 py-0.5 rounded font-bold border border-amber-500/40">LIVE</span>}
               </button>
             );
           })}

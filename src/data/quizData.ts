@@ -1,8 +1,8 @@
 import { Question } from '../types';
 
-export const QUIZ_DAY = 'DAY 07';
-export const QUIZ_TOPIC_TELUGU = 'న్యాయ-ధర్మ విచారణ, సహకార అభ్యసనం & సిమ్యులేషన్ బోధన';
-export const QUIZ_TOPIC_ENGLISH = 'Jurisprudential Inquiry, Cooperative Learning & Simulation';
+export const QUIZ_DAY = 'DAY 08';
+export const QUIZ_TOPIC_TELUGU = 'నిరంతర సమగ్ర మూల్యాంకనం (CCE)';
+export const QUIZ_TOPIC_ENGLISH = 'Continuous and Comprehensive Evaluation (CCE)';
 export const QUIZ_SUBTITLE = 'AP & TS TET / DSC – Social Methodology Revision';
 export const INSTITUTE_NAME = 'NTR Digi Class';
 export const YOUTUBE_URL = 'https://www.youtube.com/@NtrDigiclass';
@@ -925,9 +925,421 @@ export const DAY_06_QUESTIONS: Question[] = [
   }
 ];
 
-export const QUIZ_QUESTIONS: Question[] = DAY_07_QUESTIONS;
+// ==================== DAY 08 QUESTIONS ====================
+export const DAY_08_QUESTIONS: Question[] = [
+  // ==================== LEVEL 1 (Easy) ====================
+  {
+    id: 1,
+    level: 1,
+    questionTelugu: 'CCEను మొదటగా ఏ కమిషన్ ప్రతిపాదించింది?',
+    options: [
+      { key: 'A', text: 'రాధాకృష్ణన్ కమిషన్' },
+      { key: 'B', text: 'కొఠారి కమిషన్' },
+      { key: 'C', text: 'ముదాలియర్ కమిషన్' },
+      { key: 'D', text: 'హంటర్ కమిషన్' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'కొఠారి కమిషన్ (1964-66) నిరంతర సమగ్ర మూల్యాంకనం (CCE) ని మొదటగా ప్రతిపాదించింది.'
+  },
+  {
+    id: 2,
+    level: 1,
+    questionTelugu: 'CCE నినాదం ఏమిటి?',
+    options: [
+      { key: 'A', text: 'Learn Together' },
+      { key: 'B', text: 'Education for All' },
+      { key: 'C', text: 'Knowledge is Power' },
+      { key: 'D', text: 'Know as you Grow' }
+    ],
+    correctAnswer: 'D',
+    explanation: 'CCE ప్రధాన నినాదం "Know as you Grow".'
+  },
+  {
+    id: 3,
+    level: 1,
+    questionTelugu: 'భారతదేశంలో CCEను మొదట ప్రవేశపెట్టిన సంస్థ ఏది?',
+    options: [
+      { key: 'A', text: 'NCERT' },
+      { key: 'B', text: 'SCERT' },
+      { key: 'C', text: 'CBSE' },
+      { key: 'D', text: 'CABE' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'భారతదేశంలో CCEను మొదటగా CBSE (Central Board of Secondary Education) ప్రవేశపెట్టింది.'
+  },
+  {
+    id: 4,
+    level: 1,
+    questionTelugu: 'RTE Act-2009 ప్రకారం CCE ఏ అధ్యాయం, సెక్షన్లో పేర్కొనబడింది?',
+    options: [
+      { key: 'A', text: 'Chapter-5, Section-29' },
+      { key: 'B', text: 'Chapter-3, Section-20' },
+      { key: 'C', text: 'Chapter-6, Section-15' },
+      { key: 'D', text: 'Chapter-2, Section-18' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'విద్యా హక్కు చట్టం (RTE Act-2009) ప్రకారం CCE అధ్యాయం-5, సెక్షన్-29 (2)(h) లో పేర్కొనబడింది.'
+  },
+  {
+    id: 5,
+    level: 1,
+    questionTelugu: 'Continuous అంటే ఏమిటి?',
+    options: [
+      { key: 'A', text: 'పరీక్షల నిర్వహణ' },
+      { key: 'B', text: 'బోధనను నిలిపివేయడం' },
+      { key: 'C', text: 'అభ్యసనాన్ని నిరంతరం పరిశీలించడం' },
+      { key: 'D', text: 'మార్కుల కేటాయింపు' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'Continuous (నిరంతర) అనగా అభ్యసన ప్రక్రియను నిరంతరం పరిశీలించి మూల్యాంకనం చేయడం.'
+  },
+  {
+    id: 6,
+    level: 1,
+    questionTelugu: 'Comprehensive అంటే',
+    options: [
+      { key: 'A', text: 'కేవలం జ్ఞానాభివృద్ధి' },
+      { key: 'B', text: 'సర్వతోముఖ అభివృద్ధి' },
+      { key: 'C', text: 'పరీక్షా విధానం' },
+      { key: 'D', text: 'రాత పరీక్ష' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'Comprehensive (సమగ్ర) అనగా విద్యార్థి యొక్క సర్వతోముఖ అభివృద్ధిని మూల్యాంకనం చేయడం.'
+  },
+  {
+    id: 7,
+    level: 1,
+    questionTelugu: 'CCEలో మూల్యాంకనం ఎన్ని రకాలుగా ఉంటుంది?',
+    options: [
+      { key: 'A', text: '4' },
+      { key: 'B', text: '3' },
+      { key: 'C', text: '5' },
+      { key: 'D', text: '2' }
+    ],
+    correctAnswer: 'D',
+    explanation: 'CCEలో మూల్యాంకనం 2 రకాలు: నిర్మాణాత్మక మూల్యాంకనం (FA) మరియు సంగ్రహణాత్మక మూల్యాంకనం (SA).'
+  },
+  {
+    id: 8,
+    level: 1,
+    questionTelugu: 'నిర్మాణాత్మక మూల్యాంకనాన్ని ఇంగ్లీషులో ఏమంటారు?',
+    options: [
+      { key: 'A', text: 'Diagnostic Assessment' },
+      { key: 'B', text: 'Internal Assessment' },
+      { key: 'C', text: 'Formative Assessment' },
+      { key: 'D', text: 'External Assessment' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'నిర్మాణాత్మక మూల్యాంకనాన్ని Formative Assessment అని పిలుస్తారు.'
+  },
+  {
+    id: 9,
+    level: 1,
+    questionTelugu: 'సంగ్రహణాత్మక మూల్యాంకనాన్ని ఇంగ్లీషులో ఏమంటారు?',
+    options: [
+      { key: 'A', text: 'Formative Assessment' },
+      { key: 'B', text: 'Continuous Assessment' },
+      { key: 'C', text: 'Practical Assessment' },
+      { key: 'D', text: 'Summative Assessment' }
+    ],
+    correctAnswer: 'D',
+    explanation: 'సంగ్రహణాత్మక మూల్యాంకనాన్ని Summative Assessment అని పిలుస్తారు.'
+  },
+  {
+    id: 10,
+    level: 1,
+    questionTelugu: 'Formative Assessment సంవత్సరంలో ఎన్ని సార్లు నిర్వహిస్తారు?',
+    options: [
+      { key: 'A', text: '2' },
+      { key: 'B', text: '3' },
+      { key: 'C', text: '5' },
+      { key: 'D', text: '4' }
+    ],
+    correctAnswer: 'D',
+    explanation: 'ఒక విద్యా సంవత్సరంలో Formative Assessment (FA) 4 సార్లు నిర్వహిస్తారు.'
+  },
+
+  // ==================== LEVEL 2 (Medium) ====================
+  {
+    id: 11,
+    level: 2,
+    questionTelugu: 'క్రింది వాటిలో Formative Assessmentలో భాగం కానిది ఏది?',
+    options: [
+      { key: 'A', text: 'Written Works' },
+      { key: 'B', text: 'Project Work' },
+      { key: 'C', text: 'Slip Test' },
+      { key: 'D', text: 'Public Examination' }
+    ],
+    correctAnswer: 'D',
+    explanation: 'Public Examination (బాహ్య/వార్షిక పరీక్షలు) Formative Assessmentలో భాగం కాదు.'
+  },
+  {
+    id: 12,
+    level: 2,
+    questionTelugu: 'FAలో Project Workకు కేటాయించే మార్కులు',
+    options: [
+      { key: 'A', text: '20' },
+      { key: 'B', text: '5' },
+      { key: 'C', text: '10' },
+      { key: 'D', text: '15' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'Formative Assessment లో ప్రాజెక్టు పనికి (Project Work) 5 మార్కులు కేటాయిస్తారు.'
+  },
+  {
+    id: 13,
+    level: 2,
+    questionTelugu: 'Slip Test గురించి సరైనది ఏది?',
+    options: [
+      { key: 'A', text: 'ముందుగా ప్రశ్నాపత్రం ఇవ్వాలి' },
+      { key: 'B', text: 'ముందస్తు సమాచారం ఇవ్వకూడదు' },
+      { key: 'C', text: 'ఇంట్లో నిర్వహించాలి' },
+      { key: 'D', text: 'విద్యార్థులే ప్రశ్నలు తయారు చేయాలి' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'Slip Test కు ముందస్తు సమాచారం ఇవ్వకుండా తరగతి గదిలో నిర్వహించాలి.'
+  },
+  {
+    id: 14,
+    level: 2,
+    questionTelugu: 'Project Workలో ప్రధానంగా దేనిపై దృష్టి ఉంటుంది?',
+    options: [
+      { key: 'A', text: 'కంఠస్థం' },
+      { key: 'B', text: 'సమాచార సేకరణ, విశ్లేషణ' },
+      { key: 'C', text: 'మార్కులు మాత్రమే' },
+      { key: 'D', text: 'హోంవర్క్' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'Project Workలో సమాచార సేకరణ మరియు విశ్లేషణ పై ప్రధానంగా దృష్టి ఉంటుంది.'
+  },
+  {
+    id: 15,
+    level: 2,
+    questionTelugu: 'FA1 సాధారణంగా ఏ నెలలో నిర్వహిస్తారు?',
+    options: [
+      { key: 'A', text: 'జూలై' },
+      { key: 'B', text: 'నవంబర్' },
+      { key: 'C', text: 'జనవరి' },
+      { key: 'D', text: 'మార్చి' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'FA1 సాధారణంగా జూలై నెలలో నిర్వహిస్తారు.'
+  },
+  {
+    id: 16,
+    level: 2,
+    questionTelugu: 'SA1 సాధారణంగా ఏ నెలలో నిర్వహిస్తారు?',
+    options: [
+      { key: 'A', text: 'ఏప్రిల్' },
+      { key: 'B', text: 'సెప్టెంబర్' },
+      { key: 'C', text: 'అక్టోబర్' },
+      { key: 'D', text: 'ఫిబ్రవరి' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'SA1 సాధారణంగా అక్టోబర్ నెలలో నిర్వహిస్తారు.'
+  },
+  {
+    id: 17,
+    level: 2,
+    questionTelugu: 'Written Works ఉద్దేశ్యం',
+    options: [
+      { key: 'A', text: 'రాత సామర్థ్య అభివృద్ధి' },
+      { key: 'B', text: 'హాజరు నమోదు' },
+      { key: 'C', text: 'క్రీడలు' },
+      { key: 'D', text: 'పరీక్ష రద్దు' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'Written Works ఉద్దేశ్యం విద్యార్థుల రాత సామర్థ్యాన్ని అభివృద్ధి చేయడం.'
+  },
+  {
+    id: 18,
+    level: 2,
+    questionTelugu: 'ప్రాజెక్టులు ఎన్ని రకాలుగా ఉంటాయి?',
+    options: [
+      { key: 'A', text: '4' },
+      { key: 'B', text: '3' },
+      { key: 'C', text: '2' },
+      { key: 'D', text: '5' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'ప్రాజెక్టులు ప్రధానంగా 2 రకాలు (వ్యక్తిగత, సమూహ).'
+  },
+  {
+    id: 19,
+    level: 2,
+    questionTelugu: 'Project నిర్వహణలో మొదటి దశ ఏది?',
+    options: [
+      { key: 'A', text: 'నివేదిక సమర్పణ' },
+      { key: 'B', text: 'ప్రణాళిక రూపకల్పన' },
+      { key: 'C', text: 'మార్కుల కేటాయింపు' },
+      { key: 'D', text: 'మౌఖిక పరీక్ష' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'Project నిర్వహణలో మొదటి దశ ప్రణాళిక రూపకల్పన.'
+  },
+  {
+    id: 20,
+    level: 2,
+    questionTelugu: 'క్రింది వాటిలో Project నిర్వహణకు సంబంధించినది ఏది?',
+    options: [
+      { key: 'A', text: 'పరిశీలన' },
+      { key: 'B', text: 'ఇంటర్వ్యూ' },
+      { key: 'C', text: 'సమాచార సేకరణ' },
+      { key: 'D', text: 'పైవన్నీ' }
+    ],
+    correctAnswer: 'D',
+    explanation: 'పరిశీలన, ఇంటర్వ్యూ, సమాచార సేకరణలన్నీ ప్రాజెక్టు నిర్వహణకు సంబంధించినవే.'
+  },
+
+  // ==================== LEVEL 3 (Hard) ====================
+  {
+    id: 21,
+    level: 3,
+    questionTelugu: 'CCEకు సంబంధించిన నిశ్చితము (A) మరియు హేతువు (R):',
+    assertion: 'CCEను NCF-2005 కూడా సూచించింది.',
+    reason: 'NCF-2005 విద్యార్థుల నిరంతర సమగ్ర మూల్యాంకనాన్ని ప్రోత్సహించింది.',
+    options: [
+      { key: 'A', text: 'A మరియు R రెండూ నిజం; R అనేది Aకు సరైన వివరణ.' },
+      { key: 'B', text: 'A మరియు R రెండూ నిజం; కానీ R సరైన వివరణ కాదు.' },
+      { key: 'C', text: 'A నిజం; R తప్పు.' },
+      { key: 'D', text: 'A తప్పు; R నిజం.' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'NCF-2005 పరీక్షా సంస్కరణలలో భాగంగా CCEని ప్రతిపాదించి ప్రోత్సహించింది.'
+  },
+  {
+    id: 22,
+    level: 3,
+    questionTelugu: 'Formative Assessmentకు సంబంధించిన నిశ్చితము (A) మరియు హేతువు (R):',
+    assertion: 'Formative Assessment అభ్యసన ప్రగతిని నిరంతరం పరిశీలిస్తుంది.',
+    reason: 'వెనుకబడిన అంశాలను గుర్తించి వెంటనే సరిదిద్దే చర్యలు తీసుకుంటుంది.',
+    options: [
+      { key: 'A', text: 'రెండూ తప్పు' },
+      { key: 'B', text: 'రెండూ నిజం; R సరైన వివరణ' },
+      { key: 'C', text: 'A నిజం; R తప్పు' },
+      { key: 'D', text: 'A తప్పు; R నిజం' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'Formative Assessment అభ్యసనంలో లోపాలను గుర్తించి సరిదిద్దే చర్యలు తీసుకుంటుంది కావున R సరైన వివరణ.'
+  },
+  {
+    id: 23,
+    level: 3,
+    questionTelugu: 'క్రింది వాటిలో సరైన జత ఏది?',
+    options: [
+      { key: 'A', text: 'FA – 2 సార్లు' },
+      { key: 'B', text: 'SA – 4 సార్లు' },
+      { key: 'C', text: 'FA – 4 సార్లు' },
+      { key: 'D', text: 'SA – 5 సార్లు' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'విద్యా సంవత్సరంలో FA – 4 సార్లు నిర్వహిస్తారు కావున ఇది సరైన జత.'
+  },
+  {
+    id: 24,
+    level: 3,
+    questionTelugu: 'CCEలో గ్రేడింగ్ ప్రకారం 91–100 మార్కులకు గ్రేడ్',
+    options: [
+      { key: 'A', text: 'A' },
+      { key: 'B', text: 'B+' },
+      { key: 'C', text: 'A+' },
+      { key: 'D', text: 'B' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'CCE గ్రేడింగ్ ప్రకారం 91–100 మార్కులకు A+ గ్రేడ్ లభిస్తుంది.'
+  },
+  {
+    id: 25,
+    level: 3,
+    questionTelugu: '9,10 తరగతుల్లో అంతర్గత మూల్యాంకనం (FA Average) మార్కులు',
+    options: [
+      { key: 'A', text: '40' },
+      { key: 'B', text: '30' },
+      { key: 'C', text: '50' },
+      { key: 'D', text: '20' }
+    ],
+    correctAnswer: 'D',
+    explanation: '9, 10 తరగతుల్లో అంతర్గత మూల్యాంకనానికి (FA) 20 మార్కులు కేటాయిస్తారు.'
+  },
+  {
+    id: 26,
+    level: 3,
+    questionTelugu: '10వ తరగతి విద్యార్థి ఉత్తీర్ణతకు మొత్తం కనీస మార్కులు',
+    options: [
+      { key: 'A', text: '28' },
+      { key: 'B', text: '40' },
+      { key: 'C', text: '35' },
+      { key: 'D', text: '50' }
+    ],
+    correctAnswer: 'C',
+    explanation: '10వ తరగతిలో ఉత్తీర్ణతకు మొత్తం కనీసం 35 మార్కులు సాధించాలి.'
+  },
+  {
+    id: 27,
+    level: 3,
+    questionTelugu: 'క్రింది వాటిలో చారిత్రక వనరుగా వర్గీకరించబడేది ఏది?',
+    options: [
+      { key: 'A', text: 'బ్యాంకు' },
+      { key: 'B', text: 'పురాతన కట్టడాలు' },
+      { key: 'C', text: 'మార్కెట్' },
+      { key: 'D', text: 'పరిశోధనా కేంద్రం' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'పురాతన కట్టడాలు చారిత్రక ఆధార భౌతిక వనరుగా వర్గీకరించబడతాయి.'
+  },
+  {
+    id: 28,
+    level: 3,
+    questionTelugu: 'సామాజిక వనరుల వినియోగ పద్ధతుల్లో ఒకటి',
+    options: [
+      { key: 'A', text: 'పాఠశాలను సమాజం వద్దకు తీసుకుపోవడం' },
+      { key: 'B', text: 'సమాజాన్ని పాఠశాల వద్దకు తీసుకురావడం' },
+      { key: 'C', text: 'పై రెండూ' },
+      { key: 'D', text: 'ఏదీకాదు' }
+    ],
+    correctAnswer: 'C',
+    explanation: 'పాఠశాలను సమాజం వద్దకు తీసుకుపోవడం మరియు సమాజాన్ని పాఠశాల వద్దకు తీసుకురావడం రెండూ వైవిధ్యభరిత పద్ధతులే.'
+  },
+  {
+    id: 29,
+    level: 3,
+    questionTelugu: 'Summative Assessment మరియు Project Workకు సంబంధించిన నిశ్చితము (A) మరియు హేతువు (R):',
+    assertion: 'Summative Assessmentలో Project Workకు మార్కులు ఇవ్వరు.',
+    reason: 'ఇది నిర్దేశిత పాఠ్యాంశాలపై విద్యా ప్రమాణాలను అంచనా వేయడానికి నిర్వహించబడుతుంది.',
+    options: [
+      { key: 'A', text: 'A మరియు R రెండూ నిజం; R అనేది Aకు సరైన వివరణ.' },
+      { key: 'B', text: 'రెండూ నిజం; కానీ R సరైన వివరణ కాదు.' },
+      { key: 'C', text: 'A నిజం; R తప్పు.' },
+      { key: 'D', text: 'A తప్పు; R నిజం.' }
+    ],
+    correctAnswer: 'A',
+    explanation: 'Summative Assessment నేరుగా నిర్దేశిత విద్యా ప్రమాణాల అంచనాకే నిర్వహించబడుతుంది.'
+  },
+  {
+    id: 30,
+    level: 3,
+    questionTelugu: 'క్రింది వాటిలో CCE చరిత్రకు సంబంధించిన సరైన క్రమం ఏది?',
+    options: [
+      { key: 'A', text: 'RTE → Kothari → NCF' },
+      { key: 'B', text: 'Kothari → NPE → NCF → RTE' },
+      { key: 'C', text: 'NCF → CABE → Kothari' },
+      { key: 'D', text: 'CBSE → Kothari → NPE' }
+    ],
+    correctAnswer: 'B',
+    explanation: 'కొఠారి కమిషన్ (1964-66) → NPE (1986) → NCF (2005) → RTE (2009) చారిత్రక పరిణామ క్రమం.'
+  }
+];
+
+export const QUIZ_QUESTIONS: Question[] = DAY_08_QUESTIONS;
 
 export const ALL_QUIZ_DAYS: Record<string, QuizDayInfo> = {
+  'DAY 08': {
+    quizDay: 'DAY 08',
+    topicTelugu: 'నిరంతర సమగ్ర మూల్యాంకనం (CCE)',
+    topicEnglish: 'Continuous and Comprehensive Evaluation (CCE)',
+    subtitle: 'AP & TS TET / DSC – Social Methodology Revision',
+    questions: DAY_08_QUESTIONS
+  },
   'DAY 07': {
     quizDay: 'DAY 07',
     topicTelugu: 'న్యాయ-ధర్మ విచారణ, సహకార అభ్యసనం & సిమ్యులేషన్ బోధన',

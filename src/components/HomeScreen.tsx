@@ -24,13 +24,13 @@ interface HomeScreenProps {
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   user,
-  selectedDay = 'DAY 07',
+  selectedDay = 'DAY 08',
   onSelectDay,
   onStartQuiz,
   onOpenSignIn,
   onOpenRegister
 }) => {
-  const activeDayData = ALL_QUIZ_DAYS[selectedDay] || ALL_QUIZ_DAYS['DAY 07'];
+  const activeDayData = ALL_QUIZ_DAYS[selectedDay] || ALL_QUIZ_DAYS['DAY 08'];
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 sm:py-12 space-y-12 animate-fadeIn">
@@ -63,7 +63,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   }`}
                 >
                   <span>{dayKey}</span>
-                  {dayKey === 'DAY 07' && <span className="text-[10px] bg-amber-950/60 text-amber-300 px-1.5 py-0.5 rounded font-bold border border-amber-500/40">NEW</span>}
+                  {dayKey === 'DAY 08' && <span className="text-[10px] bg-amber-950/60 text-amber-300 px-1.5 py-0.5 rounded font-bold border border-amber-500/40">NEW</span>}
                 </button>
               );
             })}
