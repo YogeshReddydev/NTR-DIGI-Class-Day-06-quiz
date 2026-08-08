@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Award, Download, X, FileText, Shield, CheckCircle2 } from 'lucide-react';
+import { Award, Download, X, FileText, Shield, CheckCircle2, Loader2 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { QuizAttempt } from '../types';
@@ -10,6 +10,57 @@ interface CertificateModalProps {
   attempt: QuizAttempt;
   onClose: () => void;
 }
+
+// Helper to convert oklch(...) colors in CSS text or style tags to rgb(...) / rgba(...)
+// This prevents html2canvas from throwing "Attempting to parse an unsupported color function 'oklch'"
+const replaceOklchInCss = (cssText: string): string => {
+  return cssText.replace(/oklch\(\s*([\d.%]+)\s+([\d.%]+)\s+([\d.%]+)(?:\s*\/\s*([\d.%]+))?\s*\)/gi, (match, lStr, cStr, hStr, aStr) => {
+    try {
+      let L = lStr.endsWith('%') ? parseFloat(lStr) / 100 : parseFloat(lStr);
+      let C = cStr.endsWith('%') ? parseFloat(cStr) / 100 : parseFloat(cStr);
+      let H = parseFloat(hStr);
+      let A = aStr !== undefined ? (aStr.endsWith('%') ? parseFloat(aStr) / 100 : parseFloat(aStr)) : 1;
+
+      if (isNaN(L) || isNaN(C) || isNaN(H)) return match;
+
+      // OKLCH -> OKLAB
+      const hRad = (H * Math.PI) / 180;
+      const a = C * Math.cos(hRad);
+      const b = C * Math.sin(hRad);
+
+      // OKLAB -> LMS linear
+      const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+      const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+      const s_ = L - 0.0894841775 * a - 1.2914855480 * b;
+
+      const lComp = l_ * l_ * l_;
+      const mComp = m_ * m_ * m_;
+      const sComp = s_ * s_ * s_;
+
+      // LMS -> Linear sRGB
+      let rLin = +4.0767416621 * lComp - 3.3077115913 * mComp + 0.2309699292 * sComp;
+      let gLin = -1.2684380046 * lComp + 2.6097574011 * mComp - 0.3413193965 * sComp;
+      let bLin = -0.0041960863 * lComp - 0.7034186147 * mComp + 1.7076147010 * sComp;
+
+      // Gamma correction
+      const gammaCorrect = (val: number) => {
+        val = Math.max(0, val);
+        return val <= 0.0031308 ? val * 12.92 : 1.055 * Math.pow(val, 1 / 2.4) - 0.055;
+      };
+
+      const r = Math.min(255, Math.max(0, Math.round(gammaCorrect(rLin) * 255)));
+      const g = Math.min(255, Math.max(0, Math.round(gammaCorrect(gLin) * 255)));
+      const bComp = Math.min(255, Math.max(0, Math.round(gammaCorrect(bLin) * 255)));
+
+      if (!isNaN(A) && A < 1) {
+        return `rgba(${r}, ${g}, ${bComp}, ${A.toFixed(3)})`;
+      }
+      return `rgb(${r}, ${g}, ${bComp})`;
+    } catch {
+      return match;
+    }
+  });
+};
 
 export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onClose }) => {
   const certificateRef = useRef<HTMLDivElement>(null);
@@ -35,14 +86,32 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
       windowWidth: 1200,
       windowHeight: 900,
       onclone: (clonedDoc) => {
-        // Strip heavy blur filters that cause html2canvas processing failures
+        // 1. Convert all oklch(...) colors in <style> tags to rgb(...)/rgba(...) for html2canvas compatibility
+        const styleElements = clonedDoc.querySelectorAll('style');
+        styleElements.forEach((styleEl) => {
+          if (styleEl.textContent && styleEl.textContent.includes('oklch')) {
+            styleEl.textContent = replaceOklchInCss(styleEl.textContent);
+          }
+        });
+
+        // 2. Convert inline styles on all cloned elements
+        const allElements = clonedDoc.querySelectorAll('*');
+        allElements.forEach((el) => {
+          const htmlEl = el as HTMLElement;
+          if (htmlEl.getAttribute && htmlEl.getAttribute('style')?.includes('oklch')) {
+            const styleAttr = htmlEl.getAttribute('style') || '';
+            htmlEl.setAttribute('style', replaceOklchInCss(styleAttr));
+          }
+        });
+
+        // 3. Strip heavy blur filters that cause html2canvas processing failures
         const blurs = clonedDoc.querySelectorAll('.blur-3xl, .blur-2xl, .blur-xl, .backdrop-blur-md');
         blurs.forEach((el) => {
           (el as HTMLElement).style.filter = 'none';
           (el as HTMLElement).style.backdropFilter = 'none';
         });
 
-        // Fix CSS text-transparent / bg-clip-text issues in cloned DOM for html2canvas
+        // 4. Fix CSS text-transparent / bg-clip-text issues in cloned DOM for html2canvas
         const transparentElements = clonedDoc.querySelectorAll('.text-transparent');
         transparentElements.forEach((el) => {
           (el as HTMLElement).style.color = '#fcd34d'; // amber-300 fallback
@@ -51,7 +120,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
           (el as HTMLElement).style.backgroundImage = 'none';
         });
 
-        // Ensure proper dimensions without outer transformations
+        // 5. Ensure proper dimensions without outer transformations
         const certCard = clonedDoc.querySelector('[data-certificate-card]') as HTMLElement;
         if (certCard) {
           certCard.style.transform = 'none';
@@ -135,7 +204,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="certificateTitle">
+    <div className="certificate-modal fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="certificateTitle">
       
       {/* Outer Container */}
       <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-4xl w-full shadow-2xl overflow-hidden my-auto relative">
@@ -157,7 +226,11 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
               aria-label="Download official certificate as PDF file"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 text-xs font-black shadow-lg transition-all cursor-pointer disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
             >
-              <FileText className="w-4 h-4" aria-hidden="true" />
+              {isDownloadingPDF ? (
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <FileText className="w-4 h-4" aria-hidden="true" />
+              )}
               <span>{isDownloadingPDF ? 'Generating PDF...' : 'Download PDF'}</span>
             </button>
 
@@ -168,7 +241,11 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ attempt, onC
               aria-label="Download certificate image as PNG"
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all cursor-pointer disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
             >
-              <Download className="w-4 h-4" aria-hidden="true" />
+              {isDownloadingImage ? (
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Download className="w-4 h-4" aria-hidden="true" />
+              )}
               <span>{isDownloadingImage ? 'Generating PNG...' : 'Download PNG'}</span>
             </button>
 
