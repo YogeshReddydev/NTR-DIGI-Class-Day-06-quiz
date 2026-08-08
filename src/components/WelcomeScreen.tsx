@@ -84,14 +84,14 @@ const calculateDailyStreak = (attempts: QuizAttempt[]): { streak: number; isActi
 
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   user,
-  selectedDay = 'DAY 08',
+  selectedDay = 'DAY 09',
   onSelectDay,
   onSelectLevel,
   onChangeUser,
   onViewCertificate
 }) => {
   const { userAttempts } = useAuth();
-  const activeDayData = ALL_QUIZ_DAYS[selectedDay] || ALL_QUIZ_DAYS['DAY 08'];
+  const activeDayData = ALL_QUIZ_DAYS[selectedDay] || ALL_QUIZ_DAYS['DAY 09'];
   const { streak, isActiveToday } = calculateDailyStreak(userAttempts);
 
   return (
@@ -178,7 +178,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                 }`}
               >
                 <span>{dayKey}</span>
-                {dayKey === 'DAY 08' && <span className="text-[10px] bg-amber-950/60 text-amber-300 px-1.5 py-0.5 rounded font-bold border border-amber-500/40">LIVE</span>}
+                {dayKey === 'DAY 09' && <span className="text-[10px] bg-amber-950/60 text-amber-300 px-1.5 py-0.5 rounded font-bold border border-amber-500/40">LIVE</span>}
               </button>
             );
           })}

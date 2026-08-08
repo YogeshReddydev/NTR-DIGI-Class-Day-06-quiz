@@ -13,7 +13,7 @@ import { useAuth } from './context/AuthContext';
 export default function App() {
   const { user, userProfile, loading } = useAuth();
 
-  const [selectedDay, setSelectedDay] = useState<string>('DAY 08');
+  const [selectedDay, setSelectedDay] = useState<string>('DAY 09');
   const [localUser, setLocalUser] = useState<UserDetails | null>(null);
   const [viewState, setViewState] = useState<ViewState>('HOME');
   const [activeLevel, setActiveLevel] = useState<1 | 2 | 3>(1);
@@ -66,7 +66,7 @@ export default function App() {
   };
 
   // Get active day data and filter questions for active level
-  const activeDayData = ALL_QUIZ_DAYS[selectedDay] || ALL_QUIZ_DAYS['DAY 08'];
+  const activeDayData = ALL_QUIZ_DAYS[selectedDay] || ALL_QUIZ_DAYS['DAY 09'];
   const activeQuestions = activeDayData.questions.filter((q) => q.level === activeLevel);
 
   if (loading) {
