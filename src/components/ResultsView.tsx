@@ -306,7 +306,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                   Congratulations, {user.fullName}!
                 </h3>
                 <p className="text-sm text-emerald-300 mt-1 font-semibold">
-                  You have successfully qualified for the Day 06 Level {level} Certificate!
+                  You have successfully qualified for the {attemptData.quizDay || quizDay} Level {level} Certificate!
                 </p>
               </div>
               <button
